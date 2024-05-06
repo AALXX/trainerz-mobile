@@ -1,0 +1,65 @@
+version: '4.15'
+
+# !FOR DEPLOYMENT ONLY
+services:
+  backend:
+    image: backend:latest 
+    container_name: backend-server
+    ports:
+      - "7070:7070"
+    volumes:
+      - videos-driver:/accounts
+  video-stream-server-java:
+    image: video_stream_server_java_img:latest 
+    container_name: vides-stream-server
+    ports:
+      - "7500:7500"
+    volumes:
+      - videos-driver:/accounts
+  file-server:
+    image: file-server:latest 
+    container_name: file-server
+    ports:
+      - "7300:7300"
+  search-server:
+    image: search-server:latest 
+    container_name: search-server
+    ports:
+      - "7300:7300"
+  video-categorization-server:
+    image: categorize-server:latest 
+    container_name: categorize-server
+    ports:
+      - "6200:6200"
+  live-auth-server:
+    image: live-auth-server:latest 
+    container_name: live-auth-container
+    ports:
+      - "7555:7555"
+  rtmp:
+    image: stream-server-img:latest 
+    ports:
+      - "7550:7550"
+    container_name: rtmp_server
+    volumes:
+      - videos-driver:/accounts:rw
+  mysql-db:
+    image: mysql:latest
+    container_name: mysql-trainerz-container
+
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: trainerz_db
+      MYSQL_USER: alx
+      MYSQL_PASSWORD: serbvn
+    ports:
+      - "3306:3306" 
+    volumes:
+      - mysql-data:/var/lib/mysql
+    restart: always
+
+volumes:
+  mysql-data:
+    driver: local
+  videos-driver:
+    driver: local
