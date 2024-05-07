@@ -81,20 +81,14 @@ const ChangeUserData = async (req: CustomRequest, res: Response) => {
 
     try {
         const connection = await req.pool?.promise().getConnection();
-        const changeUserDataSQL = `UPDATE users SET 
+        const changeUserDataSQL = `zUPDATE users SET 
         UserName='${req.body.userName}', 
         Description='${req.body.userDescription}',
         UserEmail='${req.body.userEmail}', 
-        Gender='${req.body.userGender}',
-        Partener_Gender_Preferance='${req.body.userPartenerGender}',
-        Fitness_Goal='${req.body.userFitnessGoal}',
-        Favorite_Gym='${req.body.userFavoriteGym}',
-        Best_Pr='${req.body.userBestPr}',
-        Lifting_partener_for='${req.body.userLookingForAprtenerMotive}',
-        Gym_time='${req.body.userGymTime}',
-        Time_spent_in_gym='${req.body.userTimeSpentInGym}',
-        userVisibility='${req.body.userVisibility}' WHERE UserPrivateToken='${req.body.userToken}';`;
-        const resp = await query(connection, changeUserDataSQL);
+        Sport='${req.body.sport}',
+        AccountType='${req.body.accountType}',
+        userVisibility='${req.body.userVisibility}' WHERE UserPrivateToken='${req.body.userPrivateToken}';`;
+        await query(connection, changeUserDataSQL);
 
         res.status(202).json({
             error: false,
@@ -108,7 +102,6 @@ const ChangeUserData = async (req: CustomRequest, res: Response) => {
         });
     }
 };
-
 
 /**
  * Register User

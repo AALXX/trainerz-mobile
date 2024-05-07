@@ -4,18 +4,31 @@ import { IUserData } from './IAccountProfile'
 import { Image } from 'expo-image'
 import { useRouter } from 'expo-router'
 import ProfileCards from './utils/ProfileCards'
+import NavBar from '../NavBar/NavBar'
 
 const TrainerTemplate = (props: IUserData) => {
     const router = useRouter()
     const [componentToShow, setComponentToShow] = useState<string>('Videos')
     const renderComponent = () => {
         switch (componentToShow) {
-            case 'firstTab':
-                return <View className="flex h-full w-full"></View>
-            case 'secondTab':
-                return <View className="flex h-full w-full"></View>
-            case 'thirdTab':
-                return <View className="flex h-full w-full"></View>
+            case 'Videos':
+                return (
+                    <View className="flex h-full w-full">
+                        <Text>Videos</Text>
+                    </View>
+                )
+            case 'About':
+                return (
+                    <View className="flex h-full w-full">
+                        <Text>About</Text>
+                    </View>
+                )
+            case 'Message':
+                return (
+                    <View className="flex h-full w-full">
+                        <Text>Message</Text>
+                    </View>
+                )
             default:
                 return null
         }
@@ -23,7 +36,8 @@ const TrainerTemplate = (props: IUserData) => {
 
     return (
         <View>
-            <Image source={`${process.env.EXPO_PUBLIC_FILE_SERVER}/${props.UserPublicToken}/Main_Icon.png`} placeholder="acountImage" className="self-center mt-16" style={{ width: 120, height: 120, borderRadius: 50 }} />
+            <NavBar title='tedts'/>
+            <Image source={`${process.env.EXPO_PUBLIC_FILE_SERVER}/${props.UserPublicToken}/Main_Icon.png`} placeholder="acountImage" className="self-center mt-4" style={{ width: 120, height: 120, borderRadius: 50 }} />
             <View className="flex flex-col">
                 <View className="flex flex-row justify-center ">
                     <Text className="self-center  text-xl text-white mt-2">{props.UserName}</Text>
@@ -36,11 +50,8 @@ const TrainerTemplate = (props: IUserData) => {
                                 params: {
                                     UserName: props.UserName,
                                     Description: props.Description,
-                                    BirthDate: props.BirthDate.toString(),
-                                    LocationCountry: props.LocationCountry,
-                                    LocationCity: props.LocationCity,
                                     UserEmail: props.UserEmail,
-                                    userVisibility: props.UserVisibility,
+                                    UserVisibility: props.UserVisibility,
                                     AccountType: props.AccountType,
                                     Sport: props.Sport
                                 }
@@ -61,6 +72,8 @@ const TrainerTemplate = (props: IUserData) => {
                 </View>
                 <View className="bg-[#6F5596] w-full h-1 " />
             </View>
+
+            {renderComponent()}
         </View>
     )
 }

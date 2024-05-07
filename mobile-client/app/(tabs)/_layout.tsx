@@ -1,8 +1,7 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome'
-import {  Tabs } from 'expo-router'
-import {  View, useColorScheme } from 'react-native'
+import { Tabs } from 'expo-router'
+import { View, useColorScheme } from 'react-native'
 import { Image } from 'expo-image'
-
 
 /**
  * You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
@@ -45,7 +44,7 @@ export default function TabLayout() {
                             style={{ width: 50, height: 50, borderRadius: 25 }}
                         />
                     ),
-                    headerShown: false
+                    headerShown:false
                 }}
             />
         </Tabs>
