@@ -81,7 +81,7 @@ const ChangeUserData = async (req: CustomRequest, res: Response) => {
 
     try {
         const connection = await req.pool?.promise().getConnection();
-        const changeUserDataSQL = `zUPDATE users SET 
+        const changeUserDataSQL = `UPDATE users SET 
         UserName='${req.body.userName}', 
         Description='${req.body.userDescription}',
         UserEmail='${req.body.userEmail}', 

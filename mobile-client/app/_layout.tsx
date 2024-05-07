@@ -61,6 +61,7 @@ function RootLayoutNav() {
                         presentation: 'modal'
                     }}
                 />
+                <Stack.Screen name="AddCourse" />
             </Stack>
         </ThemeProvider>
     )

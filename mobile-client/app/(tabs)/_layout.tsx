@@ -24,8 +24,9 @@ export default function TabLayout() {
                 }}
             />
             <Tabs.Screen
-                name="Page2"
+                name="SearchTrainer"
                 options={{
+                    title: '',
                     headerShown: false,
                     tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
                     tabBarBackground: () => <View className="bg-[#5f56b2] opacity-60 w-full h-full" />
@@ -44,7 +45,7 @@ export default function TabLayout() {
                             style={{ width: 50, height: 50, borderRadius: 25 }}
                         />
                     ),
-                    headerShown:false
+                    headerShown: false
                 }}
             />
         </Tabs>
