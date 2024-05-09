@@ -3,6 +3,7 @@ import express, { NextFunction } from 'express';
 
 //* imports from route folder
 import UserAccountRoutes from '../routes/UserAccountRoutes/UserAccountRoutes';
+import VideosRoutes from '../routes/VideoRoutes/VideoRoutes';
 
 //* Configs
 import config from '../config/config';
@@ -33,6 +34,7 @@ router.use((req: any, res: any, next: NextFunction) => {
 
 //* Routes
 router.use('/api/user-account-manager/', UserAccountRoutes);
+router.use('/api/videos-manager/', VideosRoutes);
 
 //* Error Handleling
 router.use((req: any, res: any, next: NextFunction) => {
