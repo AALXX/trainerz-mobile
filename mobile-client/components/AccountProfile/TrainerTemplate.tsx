@@ -58,7 +58,7 @@ const TrainerTemplate = (props: IUserData) => {
                     <Image source={require('../../assets/AccountIcons/Upload_Icon.svg')} className="  w-7 h-7 self-center" alt="SettingIcon" />
                 </TouchableOpacity>
             </View>
-            <Image source={`${process.env.EXPO_PUBLIC_FILE_SERVER}/${props.UserPublicToken}/Main_Icon.png`} placeholder="acountImage" className="self-center mt-4" style={{ width: 120, height: 120, borderRadius: 50 }} />
+            <Image source={`${process.env.EXPO_PUBLIC_FILE_SERVER}/${props.UserPublicToken}/Main_Icon.png`} placeholder="acountImage" className="self-center mt-4 border" style={{ width: 120, height: 120, borderRadius: 50 }} />
             <View className="flex flex-col">
                 <View className="flex flex-row justify-center ">
                     <Text className="self-center  text-xl text-white mt-2 ">{props.UserName}</Text>

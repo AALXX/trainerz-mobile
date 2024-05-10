@@ -4,9 +4,9 @@ import { BackGroundView, View } from '../components/Themed'
 import { accLoginFunc, accRegisterFunc } from './Auth/Auth'
 import { router } from 'expo-router'
 import DropdownMenu from '../components/CommonUi/DropdownMenu'
-import { DatePickerComponent } from '../components/CommonUi/BirthDatePicker'
+import {DatePickerComponent} from '../components/CommonUi/BirthDatePicker'
 
-import * as Location from 'expo-location'
+// import * as Location from 'expo-location'
 
 const LoginRegisterModal = () => {
     const [registerForm, setRegisterForm] = useState(false)
@@ -30,22 +30,22 @@ const LoginRegisterModal = () => {
 
     useEffect(() => {
         ;(async () => {
-            let { status } = await Location.requestForegroundPermissionsAsync()
-            if (status !== 'granted') {
-                alert('Permission to access location was denied')
-                return
-            }
+            // let { status } = await Location.requestForegroundPermissionsAsync()
+            // if (status !== 'granted') {
+            //     alert('Permission to access location was denied')
+            //     return
+            // }
 
-            try {
-                let currentlocation = await Location.getCurrentPositionAsync({})
-                const location = await Location.reverseGeocodeAsync(currentlocation.coords)
-                if (location && location.length > 0) {
-                    setLocationCity(location[0].city!)
-                    setLocationCountry(location[0].country!)
-                }
-            } catch (error) {
-                console.error('Error reverse geocoding:', error)
-            }
+            // try {
+            //     let currentlocation = await Location.getCurrentPositionAsync({})
+            //     const location = await Location.reverseGeocodeAsync(currentlocation.coords)
+            //     if (location && location.length > 0) {
+            //         setLocationCity(location[0].city!)
+            //         setLocationCountry(location[0].country!)
+            //     }
+            // } catch (error) {
+            //     console.error('Error reverse geocoding:', error)
+            // }
         })()
     }, [])
 
@@ -62,7 +62,7 @@ const LoginRegisterModal = () => {
         switch (componentToShow) {
             case 'firstTab':
                 return (
-                    <View className="flex h-full w-full">
+                    <View className="flex h-full w-full flex-grow-0">
                         <View className="flex w-[85%] self-center  mt-[10%] h-24">
                             <Text className="text-sm text-white">UserName</Text>
                             <TextInput className="text-white bg-[#474084] h-[6vh] mt-[5%] indent-3 rounded-xl" placeholder="UserName..." value={registerUserName} onChangeText={text => setRegisterUserName(text)} />
@@ -80,17 +80,17 @@ const LoginRegisterModal = () => {
                         </View>
                         <View className="flex w-[85%] self-center  h-26 mt-3">
                             <Text className="text-sm text-white">What's your birth date?</Text>
-                            <DatePickerComponent setDate={setUserBirthDate} value={userBirthDate} />
+                            {/* <DatePickerComponent setDate={setUserBirthDate} value={userBirthDate} /> */}
                         </View>
                         <View className="flex w-[85%] self-center h-24 mt-7">
                             <Text className="text-sm text-white">Register as</Text>
                             <DropdownMenu options={['Trainer', 'SportsPerson']} setOption={setAccountType} value={accountType} />
                         </View>
-                        <TouchableOpacity className="self-center w-[85%] h-[6vh] mt-[5%] bg-[#3b366c] justify-center rounded-xl" onPress={() => setComponentToShow('secondTab')}>
+                        <TouchableOpacity className="self-center w-[85%] h-[6vh] bg-[#3b366c] mt-7 justify-center rounded-xl" onPress={() => setComponentToShow('secondTab')}>
                             <Text className="self-center text-white text-lg">Next</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
-                            className="self-center w-[85%] h-[6vh] mt-[5%] "
+                            className="self-center w-[85%] h-[6vh] mt-auto mb-24"
                             onPress={() => {
                                 setRegisterForm(false)
                             }}
@@ -102,7 +102,7 @@ const LoginRegisterModal = () => {
             case 'secondTab':
                 return (
                     <View className="flex h-full w-full">
-                        <View className="flex w-[85%] self-center  mt-[5%] h-24">
+                        <View className="flex w-[85%] self-center  mt-[20%] h-24">
                             <Text className="text-sm text-white">Tell us about you</Text>
                             <TextInput
                                 className="bg-[#474084] rounded-xl mt-2"
@@ -128,7 +128,7 @@ const LoginRegisterModal = () => {
                             />
                         </View>
 
-                        <TouchableOpacity className="self-center w-[85%] h-[6vh] mt-20 bg-[#3b366c] justify-center rounded-xl" onPress={() => setComponentToShow('firstTab')}>
+                        <TouchableOpacity className="self-center w-[85%] h-[6vh] mt-5 bg-[#3b366c] justify-center rounded-xl" onPress={() => setComponentToShow('firstTab')}>
                             <Text className="self-center text-white text-lg">Go Back</Text>
                         </TouchableOpacity>
                         <TouchableOpacity className="self-center w-[85%] h-[6vh] mt-[5%] bg-[#3b366c] justify-center rounded-xl" onPress={() => setComponentToShow('thirdTab')}>
@@ -159,7 +159,7 @@ const LoginRegisterModal = () => {
                                 onChangeText={text => setRegisterRepeatedPassword(text)}
                             />
                         </View>
-                        <TouchableOpacity className="self-center w-[85%] h-[6vh] mt-24 bg-[#3b366c] justify-center rounded-xl" onPress={() => setComponentToShow('secondTab')}>
+                        <TouchableOpacity className="self-center w-[85%] h-[6vh] mt-20 bg-[#3b366c] justify-center rounded-xl" onPress={() => setComponentToShow('secondTab')}>
                             <Text className="self-center text-white text-lg">Go Back</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
@@ -200,21 +200,10 @@ const LoginRegisterModal = () => {
             {!registerForm ? (
                 <View className="flex h-full w-full">
                     <View
-                        className="flex h-[90%]"
+                        className="flex h-[80vh] bg-[#594ec0c9] w-[90%] self-center mt-10 rounded-3xl"
                         style={{
-                            width: '90%',
-                            alignSelf: 'center',
-                            marginTop: '10%',
-                            backgroundColor: 'rgba(34, 34, 34, 0.13)',
-                            borderRadius: 30,
                             overflow: 'hidden',
-                            shadowColor: '#000', // for iOS
-                            shadowOffset: {
-                                width: 0,
-                                height: 2
-                            },
-                            shadowOpacity: 0.25,
-                            shadowRadius: 3.84,
+
                             elevation: 5 // for Android
                         }}
                     >
@@ -260,21 +249,10 @@ const LoginRegisterModal = () => {
             ) : (
                 <View className="w-full h-full flex ">
                     <View
-                        className="flex h-[90%]"
+                        className="flex h-[80vh] bg-[#594ec0c9] w-[90%] self-center mt-10 rounded-3xl"
                         style={{
-                            width: '90%',
-                            alignSelf: 'center',
-                            marginTop: '10%',
-                            backgroundColor: 'rgba(34, 34, 34, 0.13)',
-                            borderRadius: 30,
                             overflow: 'hidden',
-                            shadowColor: '#000', // for iOS
-                            shadowOffset: {
-                                width: 0,
-                                height: 2
-                            },
-                            shadowOpacity: 0.25,
-                            shadowRadius: 3.84,
+
                             elevation: 5 // for Android
                         }}
                     >
