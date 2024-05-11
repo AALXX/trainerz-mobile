@@ -13,6 +13,10 @@ import FFmpeg from 'fluent-ffmpeg';
 
 const NAMESPACE = 'AccountUploadServiceManager';
 
+// ////////////////////////////////
+//        Video Upload           //
+// ////////////////////////////////
+
 /**
  * Validates and cleans the CustomRequest form
  */
@@ -112,16 +116,10 @@ const UploadVideoFileToServer = async (req: any, res: Response) => {
                     });
                 }
 
-                console.log('CUMM');
-                await VideoProceesor(
-                    `${process.env.ACCOUNTS_FOLDER_PATH}/${userPublicToken}/${VideoToken}/Original.mp4`,
-                    `${process.env.ACCOUNTS_FOLDER_PATH}/${userPublicToken}/${VideoToken}/Source.mp4`,
-                    '1920x1080',
-                    16,
-                );
+                await VideoProceesor(`${process.env.ACCOUNTS_FOLDER_PATH}/${userPublicToken}/${VideoToken}/Original.mp4`, `${process.env.ACCOUNTS_FOLDER_PATH}/${userPublicToken}/${VideoToken}/Source.mp4`, 16);
 
                 // *Save video data to db
-                const success = await SendVideoDataToDb(req, userPublicToken as string, VideoToken, req.body.VideoTitle);
+                const success = await SendVideoDataToDb(req, userPublicToken as string, VideoToken, req.body.VideoTitle, req.body.Price);
                 if (success == false) {
                     return res.status(200).json({
                         error: true,
@@ -129,7 +127,7 @@ const UploadVideoFileToServer = async (req: any, res: Response) => {
                 }
 
                 // await ThumbnailProceesor(`${process.env.ACCOUNTS_FOLDER_PATH}/${userPublicToken}/${VideoToken}/Thumbnail_image.jpg`);
-                const file = fs.readFileSync(`${process.env.ACCOUNTS_FOLDER_PATH}/${userPublicToken}/${VideoToken}/Original.mp4`);
+                // const file = fs.readFileSync(`${process.env.ACCOUNTS_FOLDER_PATH}/${userPublicToken}/${VideoToken}/Original.mp4`);
 
                 // Encode the binary data as Base64
                 // const base64Video = Buffer.from(file).toString('base64');
@@ -155,26 +153,11 @@ const UploadVideoFileToServer = async (req: any, res: Response) => {
                     //     });
                     // }
 
-                    // const vide_index_server_resp = await axios.post(`${process.env.SEARCH_SERVER}/index-video`, {
-                    //     VideoTitle: req.body.VideoTitle,
-                    //     VideoToken: VideoToken,
-                    //     VideoVisibility: req.body.VideoVisibility,
-                    //     OwnerPrivateToken: req.body.UserPrivateToken,
-                    // });
-
-                    // if (vide_index_server_resp.data.error == true) {
-                    //     return res.status(200).json({
-                    //         error: true,
-                    //     });
-                    // }
-
-                    // if ((await SendVideoCategoryToDb(req, VideoToken, video_category_server_resp.data.video_type)) == false) {
-                    //     return res.status(200).json({
-                    //         error: true,
-                    //     });
-                    // }
-
-                    // * Create a 720p and 480p variant of the video
+                    if ((await SendVideoCategoryToDb(req, VideoToken, req.body.VideoSport)) == false) {
+                        return res.status(200).json({
+                            error: true,
+                        });
+                    }
 
                     return res.status(200).json({
                         error: false,
@@ -193,14 +176,14 @@ const UploadVideoFileToServer = async (req: any, res: Response) => {
  * Sends the category ID for a video to the database.
  * @param {CustomRequest} req - The custom request object.
  * @param {string} videoToken - The token of the video.
- * @param {string} CategoryId - The ID of the category.
+ * @param {string} SportName - The ID of the category.
  * @return {Promise<boolean>} - Returns true if the video category was successfully sent to the database, false otherwise.
  */
-const SendVideoCategoryToDb = async (req: CustomRequest, videoToken: string, CategoryId: string) => {
+const SendVideoCategoryToDb = async (req: CustomRequest, videoToken: string, SportName: string) => {
     try {
         const connection = await req.pool?.promise().getConnection();
 
-        const sendVideoCategoryToDbSQl = `INSERT INTO videos_categoriy_alloc (videoToken, CategoryId) VALUES ('${videoToken}','${CategoryId}')`;
+        const sendVideoCategoryToDbSQl = `INSERT INTO videos_categoriy_alloc (videoToken, SportName) VALUES ('${videoToken}','${SportName}')`;
         const accData = await query(connection, sendVideoCategoryToDbSQl);
 
         if (Object.keys(accData).length === 0) {
@@ -219,17 +202,17 @@ const SendVideoCategoryToDb = async (req: CustomRequest, videoToken: string, Cat
  * @param {string} userPublicToken - The public token of the user.
  * @param {string} videoToken - The token of the video.
  * @param {string} VideoTitle - The title of the video.
- * @param {string} VideoVisibility - The visibility of the video.
+ * @param {number} price - The visibility of the video.
  * @return {Promise<boolean>} - Returns true if the video data was successfully sent to the database, false otherwise.
  */
-const SendVideoDataToDb = async (req: CustomRequest, userPublicToken: string, videoToken: string, VideoTitle: string) => {
+const SendVideoDataToDb = async (req: CustomRequest, userPublicToken: string, videoToken: string, VideoTitle: string, price: number) => {
     const today = new Date().toISOString().slice(0, 10);
 
     try {
         const connection = await req.pool?.promise().getConnection();
 
-        const SendVidsDatasSqlQuery = `INSERT INTO videos (VideoTitle, VideoDescription, PublishDate, VideoToken, OwnerToken, Visibility)
-        VALUES("${VideoTitle}", "", "${today}","${videoToken}", "${userPublicToken}", "public")`;
+        const SendVidsDatasSqlQuery = `INSERT INTO videos (VideoTitle, VideoDescription, PublishDate, VideoPrice, VideoToken, OwnerToken, Visibility)
+        VALUES("${VideoTitle}", "", "${today}", "${price}", "${videoToken}", "${userPublicToken}", "public")`;
         const data = await query(connection, SendVidsDatasSqlQuery);
 
         const vidData = JSON.parse(JSON.stringify(data));
@@ -269,29 +252,166 @@ const ThumbnailProceesor = async (path: string) =>
  * Processes a video file by transcoding it to a specified size and codec.
  * @param {string} srcPath - The path to the source video file.
  * @param {string} dstPath - The path to the destination video file.
- * @param {string} VideoSize - The desired size of the output video, e.g. "640x360".
  * @param {number} numThreads - The number of threads to use for the video processing.
  */
-const VideoProceesor = async (srcPath: string, dstPath: string, VideoSize: string, numThreads: number) =>
+const VideoProceesor = async (srcPath: string, dstPath: string, numThreads: number) =>
     new Promise((resolve, reject) => {
-        FFmpeg(srcPath)
-            .videoCodec('libx264')
-            .audioCodec('aac')
-            .addOption('-threads', numThreads.toString()) // Set the number of threads
-            .on('progress', (progress) => {
-                console.log('Processing: ' + progress.timemark);
-            })
-            .size(VideoSize)
-            .on('error', (err) => {
-                logging.error('FFmpeg Error:', err);
+        const ffprobe = FFmpeg.ffprobe;
+
+        ffprobe(srcPath, (err, metadata) => {
+            if (err) {
+                logging.error('FFprobe Error:', err);
                 reject(err);
-            })
-            .save(dstPath)
-            .on('end', () => {
-                resolve({ error: false });
-            });
+                return;
+            }
+
+            const width = metadata.streams[0].width;
+            const height = metadata.streams[0].height;
+            let videoSize = '';
+
+            if (width! > height!) {
+                console.log('landscape');
+                // Landscape mode
+                videoSize = '1920x1080';
+            } else {
+                console.log('portrait');
+                // Portrait mode
+                // Set the desired portrait resolution here
+                videoSize = '1080x1920';
+            }
+
+            FFmpeg(srcPath)
+                .videoCodec('libx264')
+                .audioCodec('aac')
+                .addOption('-threads', numThreads.toString()) // Set the number of threads
+                .on('progress', (progress) => {
+                    console.log('Processing: ' + progress.timemark);
+                })
+                .size(videoSize)
+                .on('error', (err) => {
+                    logging.error('FFmpeg Error:', err);
+                    reject(err);
+                })
+                .save(dstPath)
+                .on('end', () => {
+                    resolve({ error: false });
+                });
+        });
     });
+
+// ////////////////////////////////
+//      Video Creator Data       //
+// ////////////////////////////////
+
+const GetAccountVideos = async (req: any, res: Response) => {
+    const errors = CustomRequestValidationResult(req);
+    if (!errors.isEmpty()) {
+        errors.array().map((error) => {
+            logging.error('GET_CREATOR_VIDEO_DATA_BY_TOKEN_FUNC', error.errorMsg);
+        });
+
+        return res.status(200).json({ error: true, errors: errors.array() });
+    }
+
+    const GetVideoDataQueryString = `SELECT v.VideoTitle, v.VideoDescription, v.OwnerToken, v.PublishDate, v.VideoPrice, v.VideoToken, v.Visibility, v.Views, u.UserName as OwnerName
+    FROM videos AS v
+    JOIN users AS u ON v.OwnerToken = u.UserPublicToken
+    WHERE v.OwnerToken = "${req.params.UserPublicToken}";`;
+
+    try {
+        const connection = await req.pool?.promise().getConnection();
+        const VideosData = await query(connection, GetVideoDataQueryString);
+
+        return res.status(202).json({
+            error: false,
+            VideosData: VideosData,
+        });
+    } catch (error: any) {
+        logging.error(NAMESPACE, error.message);
+        return res.status(500).json({
+            message: error.message,
+            error: true,
+        });
+    }
+};
+
+const UpdateVideoData = async (req: any, res: Response) => {
+    const errors = CustomRequestValidationResult(req);
+    if (!errors.isEmpty()) {
+        errors.array().map((error) => {
+            logging.error('GET_CREATOR_VIDEO_DATA_BY_TOKEN_FUNC', error.errorMsg);
+        });
+
+        return res.status(200).json({ error: true, errors: errors.array() });
+    }
+
+    try {
+        const connection = await req.pool?.promise().getConnection();
+        const userPublicToken = await utilFunctions.getUserPublicTokenFromPrivateToken(req.pool!, req.body.UserPrivateToken);
+        console.log(req.body);
+        if (userPublicToken == null) {
+            return res.status(200).json({
+                error: true,
+            });
+        }
+
+        const GetVideoDataQueryString = `UPDATE videos SET 
+        VideoTitle = "${req.body.VideoTitle}", VideoDescription = "${req.body.VideoDescription}", VideoPrice = "${req.body.VideoPrice}", Visibility = "${req.body.Visibility}" 
+        WHERE VideoToken = "${req.body.VideoToken}" AND OwnerToken = "${userPublicToken}";`;
+        await query(connection, GetVideoDataQueryString);
+
+        return res.status(202).json({
+            error: false,
+        });
+    } catch (error: any) {
+        logging.error(NAMESPACE, error.message);
+        return res.status(500).json({
+            message: error.message,
+            error: true,
+        });
+    }
+};
+
+// ////////////////////////////////
+//      Video Client             //
+// ////////////////////////////////
+const GetVideoData = async (req: any, res: Response) => {
+    const errors = CustomRequestValidationResult(req);
+    if (!errors.isEmpty()) {
+        errors.array().map((error) => {
+            logging.error('GET_CREATOR_VIDEO_DATA_BY_TOKEN_FUNC', error.errorMsg);
+        });
+
+        return res.status(200).json({ error: true, errors: errors.array() });
+    }
+    const GetVideoDataQueryString = `SELECT * FROM videos WHERE VideoToken="${req.params.VideoToken}";`;
+
+    try {
+        const connection = await req.pool?.promise().getConnection();
+        const VideoData = await query(connection, GetVideoDataQueryString);
+
+        if (Object.keys(VideoData).length === 0) {
+            return res.status(202).json({
+                error: true,
+            });
+        }
+
+        return res.status(202).json({
+            error: false,
+            VideoData: VideoData[0],
+        });
+    } catch (error: any) {
+        logging.error(NAMESPACE, error.message);
+        return res.status(500).json({
+            message: error.message,
+            error: true,
+        });
+    }
+};
 
 export default {
     UploadVideoFileToServer,
+    UpdateVideoData,
+    GetAccountVideos,
+    GetVideoData,
 };

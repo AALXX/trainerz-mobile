@@ -37,5 +37,6 @@ yarn-error.log*
 server/backend/*.tsbuildinfo
 server/backend/.env
 server/backend/next-env.d.ts
+server/accounts
 
 .svn/

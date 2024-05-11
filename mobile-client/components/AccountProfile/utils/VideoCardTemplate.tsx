@@ -1,6 +1,8 @@
 import { View, Text, TouchableOpacity } from 'react-native'
 import React from 'react'
 import { Link } from 'expo-router'
+import { router } from 'expo-router'
+
 export interface IVideoTemplateProps {
     VideoTitle: string
     VideoToken: string
@@ -9,7 +11,7 @@ export interface IVideoTemplateProps {
     OwnerToken: string
     ViwerToken: string
 }
-
+;``
 import { Image } from 'expo-image'
 import TruncatedText from './TruncatedText'
 import { abbreviateNumber } from './NumberAbrev'
@@ -17,7 +19,7 @@ import { abbreviateNumber } from './NumberAbrev'
 const VideoCardTemplate = (props: IVideoTemplateProps) => {
     return (
         <View className="flex mt-[2vh] w-[95%] h-52  self-center">
-            <Link href={`/watch/${props.VideoToken}`} asChild>
+            <View>
                 <TouchableOpacity className="w-full h-full">
                     <View className="flex flex-col bg-white w-full h-full ">
                         <Image source={`${process.env.EXPO_PUBLIC_FILE_SERVER}/${props.OwnerToken}/${props.VideoToken}/Thumbnail_image.jpg`} placeholder="acountImage" className="absolute self-center w-full h-full" />
@@ -36,7 +38,15 @@ const VideoCardTemplate = (props: IVideoTemplateProps) => {
                                     <View className="h-full ml-auto mr-5 flex-row">
                                         <Text className="text-white self-center text-lg mr-2 ">{abbreviateNumber(props.Views)}</Text>
                                         <Image source={require('../../../assets/VideoIcons/Views_icon.svg')} placeholder="acountImage" className=" self-center  w-5 h-5 mr-2" />
-                                        <Image source={require('../../../assets/AccountIcons/Settings_icon.svg')} placeholder="acountImage" className=" self-center  w-5 h-5 " />
+
+                                        <TouchableOpacity
+                                            className="self-center"
+                                            onPress={() => {
+                                                router.push('/EditVideoCourse')
+                                            }}
+                                        >
+                                            <Image source={require('../../../assets/AccountIcons/Settings_icon.svg')} placeholder="acountImage" className=" self-center  w-5 h-5 " />
+                                        </TouchableOpacity>
                                     </View>
                                 ) : (
                                     <View className="h-full ml-auto mr-5 flex-row">
@@ -48,7 +58,7 @@ const VideoCardTemplate = (props: IVideoTemplateProps) => {
                         </View>
                     </View>
                 </TouchableOpacity>
-            </Link>
+            </View>
         </View>
     )
 }
