@@ -8,6 +8,7 @@ import { useRouter } from 'expo-router'
 import axios from 'axios'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import DropdownMenu from '../components/CommonUi/DropdownMenu'
+import Slider from '@react-native-community/slider'
 
 const AddCourse = () => {
     const [media, setMedia] = useState<ImagePicker.ImagePickerResult | null>(null)
@@ -15,9 +16,10 @@ const AddCourse = () => {
 
     //* Video attributes states
     const [videoTitle, setvideoTitle] = useState<string>('')
-    const [videoPrice, setVideoPrice] = useState<string>('')
     const [sport, setSport] = useState<string>('')
     const [videoVisibility, setvideoVisibility] = useState<string>('public')
+    const [price, setPrice] = useState(50)
+
     const videoRef = useRef(null)
 
     const pickMedia = async () => {
@@ -52,6 +54,8 @@ const AddCourse = () => {
         formData.append('VideoFile', { uri: videoUri, name: 'video.mp4', type: 'video/mp4' })
         // formData.append('VideoThumbnail', { uri: 'http://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4', name: 'thumbnail.jpg', type: 'image/jpeg' })
         formData.append('VideoTitle', videoTitle)
+        formData.append('VideoSport', sport)
+        formData.append('Price', price)
         // formData.append('VideoVisibility', videoVisibility)
         formData.append('UserPrivateToken', userToken)
 
@@ -59,9 +63,13 @@ const AddCourse = () => {
             const response = await axios.post(`${process.env.EXPO_PUBLIC_SERVER_BACKEND}/videos-manager/upload-video`, formData, {
                 headers: { 'content-type': 'multipart/form-data' }
             })
-            console.log(response.data)
+
+            if (response.data.error == false) {
+                alert('Video Posted Successfully')
+                return
+            }
         } catch (error) {
-            console.error(error)
+            alert(error)
         }
     }
 
@@ -85,11 +93,11 @@ const AddCourse = () => {
                 </View>
                 <View className="flex w-[95%] self-center  mt-4 h-24">
                     <Text className="text-sm text-white">Title</Text>
-                    <TextInput className="text-white bg-[#3b366c] h-[6vh] mt-[2%] indent-3 rounded-xl" placeholder="UserName..." value={videoTitle} onChangeText={text => setvideoTitle(text)} />
+                    <TextInput className="text-white bg-[#3b366c]  h-[6vh] mt-[2%] indent-3 rounded-xl placeholder-white" placeholder="Video Title..." value={videoTitle} onChangeText={text => setvideoTitle(text)} />
                 </View>
                 <View className="flex w-[95%] self-center  mt-2 h-24">
-                    <Text className="text-sm text-white">Price</Text>
-                    <TextInput className="text-white bg-[#3b366c] h-[6vh] mt-[2%] indent-3 rounded-xl" placeholder="UserName..." value={videoPrice} onChangeText={text => setVideoPrice(text)} />
+                    <Text className="text-sm text-white">Price: ${price.toFixed(2)}</Text>
+                    <Slider minimumTrackTintColor={'#6e64c6'} thumbTintColor="#2f2b57" minimumValue={0} maximumValue={100} step={1} value={price} onValueChange={setPrice} />
                 </View>
                 <View className="flex w-[95%] self-center h-24 mt-1">
                     <Text className="text-sm text-white">Video Sport</Text>
@@ -100,12 +108,12 @@ const AddCourse = () => {
                     />
                 </View>
                 <TouchableOpacity
-                    className="flex flex-row bg-[#575757] self-center  border-none text-white mt-4 h-10 w-[90%] rounded-xl  hover:bg-[#525252] active:bg-[#2b2b2b]"
+                    className="flex flex-row bg-[#3b366c] self-center  border-none text-white mt-4 h-10 w-[95%] rounded-xl"
                     onPress={async () => {
                         await uploadFile()
                     }}
                 >
-                    <Text className="w-full text-white text-center m-auto hover:bg-[#525252] active:bg-[#2b2b2b]">Upload!</Text>
+                    <Text className="w-full text-white text-center m-auto ">Upload!</Text>
                 </TouchableOpacity>
             </View>
         </BackGroundView>

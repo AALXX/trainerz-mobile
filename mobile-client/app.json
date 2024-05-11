@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "GymBro-mobile",
-    "slug": "GymBro-mobile",
+    "name": "Trainerz-mobile",
+    "slug": "Trainerz-mobile",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -22,7 +22,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.s3rbvn.Trainerzmobile"
     },
     "web": {
       "bundler": "metro",
@@ -40,6 +41,14 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "9c5f820f-bf71-449b-807d-bb2d25101b47"
+      }
     }
   }
 }

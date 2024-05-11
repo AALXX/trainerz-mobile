@@ -1,20 +1,55 @@
-import { View, Text, TouchableOpacity, TextInput } from 'react-native'
-import React, { useState } from 'react'
+import { View, Text, TouchableOpacity, TextInput, ScrollView } from 'react-native'
+import React, { useEffect, useState } from 'react'
 import { IUserData } from './IAccountProfile'
 import { Image } from 'expo-image'
 import { useRouter } from 'expo-router'
 import ProfileCards from './utils/ProfileCards'
-import NavBar from '../NavBar/NavBar'
+import axios from 'axios'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import VideoCardTemplate, { IVideoTemplateProps } from './utils/VideoCardTemplate'
 
 const TrainerTemplate = (props: IUserData) => {
     const router = useRouter()
-    const [componentToShow, setComponentToShow] = useState<string>('Videos')
+    const [userPublicToken, setUserPublicToken] = useState<string>('')
+    const [componentToShow, setComponentToShow] = useState<string>('Courses')
+    const [videosData, setVideosData] = useState<Array<IVideoTemplateProps>>([{ OwnerName: '', OwnerToken: '', VideoTitle: '', VideoToken: '', Views: 0, ViwerToken: '' }])
+
+    const GetVideos = async () => {
+        const userToken = (await AsyncStorage.getItem('userPublicToken')) as string
+        setUserPublicToken(userToken)
+
+        const resp = await axios.get(`${process.env.EXPO_PUBLIC_SERVER_BACKEND}/videos-manager/get-account-videos/${userToken}`)
+        setVideosData(resp.data.VideosData)
+    }
+
+    useEffect(() => {
+        ;(async () => {
+            await GetVideos()
+        })()
+    }, [])
+
     const renderComponent = () => {
         switch (componentToShow) {
             case 'Courses':
                 return (
                     <View className="flex h-full w-full">
-                        <Text>Videos</Text>
+                        {Object.keys(videosData).length > 0 ? (
+                            <>
+                                {videosData.map((video: IVideoTemplateProps, index: number) => (
+                                    <VideoCardTemplate
+                                        key={index}
+                                        OwnerName={video.OwnerName}
+                                        OwnerToken={video.OwnerToken}
+                                        VideoTitle={video.VideoTitle}
+                                        VideoToken={video.VideoToken}
+                                        Views={video.Views}
+                                        ViwerToken={userPublicToken}
+                                    />
+                                ))}
+                            </>
+                        ) : (
+                            <></>
+                        )}
                     </View>
                 )
             case 'About':
@@ -51,14 +86,19 @@ const TrainerTemplate = (props: IUserData) => {
     }
 
     return (
-        <View>
+        <ScrollView>
             <View className="w-full h-[12vh] bg-[#1b1b1b3a] flex  flex-row  items-center">
                 <Text className="self-center text-white mt-10 font-bold ml-4">TRAINERZ</Text>
                 <TouchableOpacity className="ml-auto mt-9 mr-4" onPress={() => router.push('/AddCourse')}>
                     <Image source={require('../../assets/AccountIcons/Upload_Icon.svg')} className="  w-7 h-7 self-center" alt="SettingIcon" />
                 </TouchableOpacity>
             </View>
-            <Image source={`${process.env.EXPO_PUBLIC_FILE_SERVER}/${props.UserPublicToken}/Main_Icon.png`} placeholder="acountImage" className="self-center mt-4 border" style={{ width: 120, height: 120, borderRadius: 50 }} />
+            <Image
+                source={`${process.env.EXPO_PUBLIC_FILE_SERVER}/${props.UserPublicToken}/Main_Icon.png`}
+                placeholder="acountImage"
+                className="self-center mt-4 border"
+                style={{ width: 120, height: 120, borderRadius: 50 }}
+            />
             <View className="flex flex-col">
                 <View className="flex flex-row justify-center ">
                     <Text className="self-center  text-xl text-white mt-2 ">{props.UserName}</Text>
@@ -95,7 +135,7 @@ const TrainerTemplate = (props: IUserData) => {
             </View>
 
             {renderComponent()}
-        </View>
+        </ScrollView>
     )
 }
 
