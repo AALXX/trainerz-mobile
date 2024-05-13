@@ -1,0 +1,12 @@
+version: '4.15'
+
+# !FOR DEPLOYMENT ONLY
+services:
+  backend:
+    build: .
+    container_name: backend-server
+    command: npm run server
+    ports:
+      - '7070:7070'
+    volumes:
+      - .:/backend
