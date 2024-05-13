@@ -14,7 +14,7 @@ router.post(
     body('UserPrivateToken').not().isEmpty().trim(),
     body('VideoToken').not().isEmpty().trim(),
     body('VideoTitle').not().isEmpty().trim(),
-    body('VideoDescription').not().isEmpty().trim(),
+    body('VideoDescription'),
     body('VideoSport').not().isEmpty().trim(),
     body('VideoPrice').not().isEmpty().trim(),
     body('Visibility').not().isEmpty().trim(),

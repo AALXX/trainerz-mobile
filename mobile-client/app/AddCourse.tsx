@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, TextInput } from 'react-native'
+import { View, Text, TouchableOpacity, TextInput, Switch } from 'react-native'
 import React, { useRef, useState } from 'react'
 import { BackGroundView } from '../components/Themed'
 import * as ImagePicker from 'expo-image-picker'
@@ -18,7 +18,8 @@ const AddCourse = () => {
     const [videoTitle, setvideoTitle] = useState<string>('')
     const [sport, setSport] = useState<string>('')
     const [videoVisibility, setvideoVisibility] = useState<string>('public')
-    const [price, setPrice] = useState(50)
+    const [price, setPrice] = useState(0)
+    const [customPrice, setCustomPrice] = useState<boolean>(false)
 
     const videoRef = useRef(null)
 
@@ -55,7 +56,11 @@ const AddCourse = () => {
         // formData.append('VideoThumbnail', { uri: 'http://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4', name: 'thumbnail.jpg', type: 'image/jpeg' })
         formData.append('VideoTitle', videoTitle)
         formData.append('VideoSport', sport)
-        formData.append('Price', price)
+        if(customPrice) {
+            formData.append('Price', price)
+        } else {
+            formData.append('Price', 0)
+        }
         // formData.append('VideoVisibility', videoVisibility)
         formData.append('UserPrivateToken', userToken)
 
@@ -65,7 +70,12 @@ const AddCourse = () => {
             })
 
             if (response.data.error == false) {
-                alert('Video Posted Successfully')
+                router.replace({
+                    pathname: '/AccountProfile',
+                    params: {
+                        UpdateData: 'true'
+                    }
+                })
                 return
             }
         } catch (error) {
@@ -95,11 +105,8 @@ const AddCourse = () => {
                     <Text className="text-sm text-white">Title</Text>
                     <TextInput className="text-white bg-[#3b366c]  h-[6vh] mt-[2%] indent-3 rounded-xl placeholder-white" placeholder="Video Title..." value={videoTitle} onChangeText={text => setvideoTitle(text)} />
                 </View>
-                <View className="flex w-[95%] self-center  mt-2 h-24">
-                    <Text className="text-sm text-white">Price: ${price.toFixed(2)}</Text>
-                    <Slider minimumTrackTintColor={'#6e64c6'} thumbTintColor="#2f2b57" minimumValue={0} maximumValue={100} step={1} value={price} onValueChange={setPrice} />
-                </View>
-                <View className="flex w-[95%] self-center h-24 mt-1">
+
+                <View className="flex w-[95%] self-center h-24 mt-2">
                     <Text className="text-sm text-white">Video Sport</Text>
                     <DropdownMenu
                         options={['Football', 'Basketball', 'Cricket', 'Tennis', 'Golf', 'Rugby', 'Ice Hockey', 'Athletics (Track and Field):', 'Swimming', 'Powerlifting', 'Other']}
@@ -107,8 +114,28 @@ const AddCourse = () => {
                         value={sport}
                     />
                 </View>
+
+                <View className="flex w-[95%] self-center  mt-2 h-24">
+                    <View className="flex flex-row w-full ">
+                        <Text className="text-white self-center text-lg">Custom Price</Text>
+                        <Switch
+                            className="self-center "
+                            trackColor={{ false: '#767577', true: '#81b0ff' }}
+                            thumbColor={customPrice ? '#fff' : '#f4f3f4'}
+                            ios_backgroundColor="#3e3e3e"
+                            onValueChange={() => setCustomPrice(!customPrice)}
+                            value={customPrice}
+                        />
+                    </View>
+                    {customPrice ? (
+                        <View>
+                            <Text className="text-sm text-white mt-2">Price: ${price.toFixed(2)}</Text>
+                            <Slider minimumTrackTintColor={'#6e64c6'} thumbTintColor="#2f2b57" minimumValue={0} maximumValue={100} step={1} value={price} onValueChange={setPrice} />
+                        </View>
+                    ) : null}
+                </View>
                 <TouchableOpacity
-                    className="flex flex-row bg-[#3b366c] self-center  border-none text-white mt-4 h-10 w-[95%] rounded-xl"
+                    className="flex flex-row bg-[#3b366c] self-center  border-none text-white mt-8 h-10 w-[95%] rounded-xl"
                     onPress={async () => {
                         await uploadFile()
                     }}

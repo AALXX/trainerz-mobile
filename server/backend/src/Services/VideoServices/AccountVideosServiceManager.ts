@@ -313,7 +313,7 @@ const GetAccountVideos = async (req: CustomRequest, res: Response) => {
     const errors = CustomRequestValidationResult(req);
     if (!errors.isEmpty()) {
         errors.array().map((error) => {
-            logging.error('GET_CREATOR_VIDEO_DATA_BY_TOKEN_FUNC', error.errorMsg);
+            logging.error('GET_ACCOUNT_VIDEO_FUNC', error.errorMsg);
         });
 
         return res.status(200).json({ error: true, errors: errors.array() });
@@ -351,7 +351,7 @@ const UpdateVideoData = async (req: CustomRequest, res: Response) => {
     const errors = CustomRequestValidationResult(req);
     if (!errors.isEmpty()) {
         errors.array().map((error) => {
-            logging.error('GET_CREATOR_VIDEO_DATA_BY_TOKEN_FUNC', error.errorMsg);
+            logging.error('UPDATE_VIDEO_DATA_FUNC', error.errorMsg);
         });
 
         return res.status(200).json({ error: true, errors: errors.array() });
@@ -408,7 +408,7 @@ const GetVideoData = async (req: any, res: Response) => {
     const errors = CustomRequestValidationResult(req);
     if (!errors.isEmpty()) {
         errors.array().map((error) => {
-            logging.error('GET_CREATOR_VIDEO_DATA_BY_TOKEN_FUNC', error.errorMsg);
+            logging.error('GET_VIDEO_DATA_FUNC', error.errorMsg);
         });
 
         return res.status(200).json({ error: true, errors: errors.array() });
