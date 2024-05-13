@@ -4,7 +4,8 @@ import { BackGroundView, View } from '../components/Themed'
 import { accLoginFunc, accRegisterFunc } from './Auth/Auth'
 import { router } from 'expo-router'
 import DropdownMenu from '../components/CommonUi/DropdownMenu'
-import {DatePickerComponent} from '../components/CommonUi/BirthDatePicker'
+import { DatePickerComponent } from '../components/CommonUi/BirthDatePicker'
+import Slider from '@react-native-community/slider'
 
 // import * as Location from 'expo-location'
 
@@ -19,6 +20,7 @@ const LoginRegisterModal = () => {
     const [description, setDescription] = useState<string>('')
     const [accountType, setAccountType] = useState<string>('')
     const [sport, setSport] = useState<string>('')
+    const [accountPrice, setAccountPrice] = useState<number>(0)
     const [userBirthDate, setUserBirthDate] = useState<Date>(new Date())
 
     // *-----------------------Login_Props-----------------------//
@@ -35,7 +37,6 @@ const LoginRegisterModal = () => {
             //     alert('Permission to access location was denied')
             //     return
             // }
-
             // try {
             //     let currentlocation = await Location.getCurrentPositionAsync({})
             //     const location = await Location.reverseGeocodeAsync(currentlocation.coords)
@@ -80,13 +81,13 @@ const LoginRegisterModal = () => {
                         </View>
                         <View className="flex w-[85%] self-center  h-26 mt-3">
                             <Text className="text-sm text-white">What's your birth date?</Text>
-                            {/* <DatePickerComponent setDate={setUserBirthDate} value={userBirthDate} /> */}
+                            <DatePickerComponent setDate={setUserBirthDate} value={userBirthDate} />
                         </View>
                         <View className="flex w-[85%] self-center h-24 mt-7">
                             <Text className="text-sm text-white">Register as</Text>
                             <DropdownMenu options={['Trainer', 'SportsPerson']} setOption={setAccountType} value={accountType} />
                         </View>
-                        <TouchableOpacity className="self-center w-[85%] h-[6vh] bg-[#3b366c] mt-7 justify-center rounded-xl" onPress={() => setComponentToShow('secondTab')}>
+                        <TouchableOpacity className="self-center w-[85%] h-[6vh] bg-[#3b366c]  justify-center rounded-xl" onPress={() => setComponentToShow('secondTab')}>
                             <Text className="self-center text-white text-lg">Next</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
@@ -139,37 +140,80 @@ const LoginRegisterModal = () => {
             case 'thirdTab':
                 return (
                     <View className="flex h-full w-full">
-                        <View className="flex w-[85%] self-center mt-32 h-24">
-                            <Text className="text-sm text-white">Password</Text>
-                            <TextInput
-                                className="text-white bg-[#474084] h-[6vh] mt-[5%] indent-3 rounded-xl"
-                                secureTextEntry={true}
-                                placeholder="Password..."
-                                value={registerPassword}
-                                onChangeText={text => setRegisterPassword(text)}
-                            />
-                        </View>
-                        <View className="flex w-[85%] self-center h-24">
-                            <Text className="text-sm text-white">Repeat Password</Text>
-                            <TextInput
-                                className="text-white bg-[#474084] h-[6vh] mt-[5%] indent-3 rounded-xl"
-                                secureTextEntry={true}
-                                placeholder="RepeatPassword..."
-                                value={registerRepetedPassword}
-                                onChangeText={text => setRegisterRepeatedPassword(text)}
-                            />
-                        </View>
-                        <TouchableOpacity className="self-center w-[85%] h-[6vh] mt-20 bg-[#3b366c] justify-center rounded-xl" onPress={() => setComponentToShow('secondTab')}>
-                            <Text className="self-center text-white text-lg">Go Back</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            className="self-center w-[85%] h-[6vh] mt-[5%] bg-[#3b366c] justify-center rounded-xl"
-                            onPress={async () => {
-                                await RegisterAcc()
-                            }}
-                        >
-                            <Text className="self-center text-white text-lg">Sign In</Text>
-                        </TouchableOpacity>
+                        {accountType === 'Trainer' ? (
+                            <View>
+                                <View className="flex w-[85%] self-center mt-20 h-16    ">
+                                    <Text className="text-sm text-white">Account Pricing: ${accountPrice.toFixed(2)}</Text>
+
+                                    <Slider minimumTrackTintColor={'#6e64c6'} thumbTintColor="#2f2b57" minimumValue={0} maximumValue={100} step={1} value={accountPrice} onValueChange={setAccountPrice} />
+                                </View>
+                                <View className="flex w-[85%] self-center mt-2 h-24">
+                                    <Text className="text-sm text-white">Password</Text>
+                                    <TextInput
+                                        className="text-white bg-[#474084] h-[6vh] mt-[5%] indent-3 rounded-xl"
+                                        secureTextEntry={true}
+                                        placeholder="Password..."
+                                        value={registerPassword}
+                                        onChangeText={text => setRegisterPassword(text)}
+                                    />
+                                </View>
+                                <View className="flex w-[85%] self-center h-24">
+                                    <Text className="text-sm text-white">Repeat Password</Text>
+                                    <TextInput
+                                        className="text-white bg-[#474084] h-[6vh] mt-[5%] indent-3 rounded-xl"
+                                        secureTextEntry={true}
+                                        placeholder="RepeatPassword..."
+                                        value={registerRepetedPassword}
+                                        onChangeText={text => setRegisterRepeatedPassword(text)}
+                                    />
+                                </View>
+                                <TouchableOpacity className="self-center w-[85%] h-[6vh] mt-14 bg-[#3b366c] justify-center rounded-xl" onPress={() => setComponentToShow('secondTab')}>
+                                    <Text className="self-center text-white text-lg">Go Back</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    className="self-center w-[85%] h-[6vh] mt-[5%] bg-[#3b366c] justify-center rounded-xl"
+                                    onPress={async () => {
+                                        await RegisterAcc()
+                                    }}
+                                >
+                                    <Text className="self-center text-white text-lg">Sign In</Text>
+                                </TouchableOpacity>
+                            </View>
+                        ) : (
+                            <View>
+                                <View className="flex w-[85%] self-center mt-28 h-24">
+                                    <Text className="text-sm text-white">Password</Text>
+                                    <TextInput
+                                        className="text-white bg-[#474084] h-[6vh] mt-[5%] indent-3 rounded-xl"
+                                        secureTextEntry={true}
+                                        placeholder="Password..."
+                                        value={registerPassword}
+                                        onChangeText={text => setRegisterPassword(text)}
+                                    />
+                                </View>
+                                <View className="flex w-[85%] self-center h-24 mt-2">
+                                    <Text className="text-sm text-white">Repeat Password</Text>
+                                    <TextInput
+                                        className="text-white bg-[#474084] h-[6vh] mt-[5%] indent-3 rounded-xl"
+                                        secureTextEntry={true}
+                                        placeholder="RepeatPassword..."
+                                        value={registerRepetedPassword}
+                                        onChangeText={text => setRegisterRepeatedPassword(text)}
+                                    />
+                                </View>
+                                <TouchableOpacity className="self-center w-[85%] h-[6vh] mt-24 bg-[#3b366c] justify-center rounded-xl" onPress={() => setComponentToShow('secondTab')}>
+                                    <Text className="self-center text-white text-lg">Go Back</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    className="self-center w-[85%] h-[6vh] mt-[5%] bg-[#3b366c] justify-center rounded-xl"
+                                    onPress={async () => {
+                                        await RegisterAcc()
+                                    }}
+                                >
+                                    <Text className="self-center text-white text-lg">Sign In</Text>
+                                </TouchableOpacity>
+                            </View>
+                        )}
                     </View>
                 )
             default:
@@ -178,18 +222,11 @@ const LoginRegisterModal = () => {
     }
 
     const RegisterAcc = async () => {
-        if (
-            registerUserName == '' ||
-            registerEmail == '' ||
-            registerPassword == '' ||
-            registerRepetedPassword == '' ||
-            sport == '' ||
-            userBirthDate == null 
-        ) {
+        if (registerUserName == '' || registerEmail == '' || registerPassword == '' || registerRepetedPassword == '' || sport == '' || userBirthDate == null) {
             return alert('Please fill all the fields!')
         }
 
-        const succesfullRegister = await accRegisterFunc(registerUserName, registerEmail, registerPassword, registerRepetedPassword, description, sport, accountType,userBirthDate, locationCity, locationCountry)
+        const succesfullRegister = await accRegisterFunc(registerUserName, registerEmail, registerPassword, registerRepetedPassword, description, sport, accountPrice, accountType, userBirthDate, locationCity, locationCountry)
         if (succesfullRegister) {
             router.replace('/AccountProfile')
         }

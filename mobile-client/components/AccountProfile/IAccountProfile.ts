@@ -11,6 +11,7 @@ export interface IUserData {
     UserVisibility: string
     AccountType: string
     UserPublicToken: string
+    AccountPrice?: number
 }
 
 export interface IProfileCards {

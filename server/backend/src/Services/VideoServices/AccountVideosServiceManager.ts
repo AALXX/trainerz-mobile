@@ -183,7 +183,7 @@ const SendVideoCategoryToDb = async (req: CustomRequest, videoToken: string, Spo
     try {
         const connection = await req.pool?.promise().getConnection();
 
-        const sendVideoCategoryToDbSQl = `INSERT INTO videos_categoriy_alloc (videoToken, SportName) VALUES ('${videoToken}','${SportName}')`;
+        const sendVideoCategoryToDbSQl = `INSERT INTO videos_category_alloc (videoToken, SportName) VALUES ('${videoToken}','${SportName}')`;
         const accData = await query(connection, sendVideoCategoryToDbSQl);
 
         if (Object.keys(accData).length === 0) {
@@ -303,7 +303,13 @@ const VideoProceesor = async (srcPath: string, dstPath: string, numThreads: numb
 //      Video Creator Data       //
 // ////////////////////////////////
 
-const GetAccountVideos = async (req: any, res: Response) => {
+/**
+ * Retrieves the list of videos owned by the user with the specified public token.
+ *
+ * @param {CustomRequest} req - The HTTP request object, containing the user's public token in the `req.params.UserPublicToken` property.
+ * @param {Response} res - The HTTP response object, which will be used to send the video data back to the client.
+ */
+const GetAccountVideos = async (req: CustomRequest, res: Response) => {
     const errors = CustomRequestValidationResult(req);
     if (!errors.isEmpty()) {
         errors.array().map((error) => {
@@ -313,15 +319,15 @@ const GetAccountVideos = async (req: any, res: Response) => {
         return res.status(200).json({ error: true, errors: errors.array() });
     }
 
-    const GetVideoDataQueryString = `SELECT v.VideoTitle, v.VideoDescription, v.OwnerToken, v.PublishDate, v.VideoPrice, v.VideoToken, v.Visibility, v.Views, u.UserName as OwnerName
+    const GetVideoDataQueryString = `SELECT v.VideoTitle, v.VideoDescription, v.OwnerToken, v.PublishDate, v.VideoPrice, v.VideoToken, v.Visibility, v.Views, u.UserName as OwnerName, a.SportName
     FROM videos AS v
     JOIN users AS u ON v.OwnerToken = u.UserPublicToken
+    LEFT JOIN videos_category_alloc AS a ON v.VideoToken = a.VideoToken
     WHERE v.OwnerToken = "${req.params.UserPublicToken}";`;
 
     try {
         const connection = await req.pool?.promise().getConnection();
         const VideosData = await query(connection, GetVideoDataQueryString);
-
         return res.status(202).json({
             error: false,
             VideosData: VideosData,
@@ -335,7 +341,13 @@ const GetAccountVideos = async (req: any, res: Response) => {
     }
 };
 
-const UpdateVideoData = async (req: any, res: Response) => {
+/**
+ * Updates the data for a video in the database.
+ *
+ * @param {CustomRequest} req - The custom request object containing the video data to update.
+ * @param {Response} res - The response object to send the update result.
+ */
+const UpdateVideoData = async (req: CustomRequest, res: Response) => {
     const errors = CustomRequestValidationResult(req);
     if (!errors.isEmpty()) {
         errors.array().map((error) => {
@@ -355,9 +367,26 @@ const UpdateVideoData = async (req: any, res: Response) => {
             });
         }
 
-        const GetVideoDataQueryString = `UPDATE videos SET 
-        VideoTitle = "${req.body.VideoTitle}", VideoDescription = "${req.body.VideoDescription}", VideoPrice = "${req.body.VideoPrice}", Visibility = "${req.body.Visibility}" 
-        WHERE VideoToken = "${req.body.VideoToken}" AND OwnerToken = "${userPublicToken}";`;
+        const GetVideoDataQueryString = `START TRANSACTION;
+        UPDATE videos
+        SET 
+            VideoTitle = "${req.body.VideoTitle}", 
+            VideoDescription = "${req.body.VideoDescription}", 
+            VideoPrice = "${req.body.VideoPrice}", 
+            Visibility = "${req.body.Visibility}" 
+        WHERE 
+            VideoToken = "${req.body.VideoToken}" AND OwnerToken = "${userPublicToken}";
+
+        UPDATE videos_category_alloc
+        SET 
+            SportName = "${req.body.VideoSport}"
+        WHERE 
+            VideoToken = "${req.body.VideoToken}" AND EXISTS (
+                SELECT 1 FROM videos 
+                WHERE VideoToken = "${req.body.VideoToken}" AND OwnerToken = "${userPublicToken}"
+            );
+        
+        COMMIT;`;
         await query(connection, GetVideoDataQueryString);
 
         return res.status(202).json({
@@ -384,12 +413,17 @@ const GetVideoData = async (req: any, res: Response) => {
 
         return res.status(200).json({ error: true, errors: errors.array() });
     }
-    const GetVideoDataQueryString = `SELECT * FROM videos WHERE VideoToken="${req.params.VideoToken}";`;
+
+
+    const GetVideoDataQueryString = `SELECT v.VideoTitle, v.VideoDescription, v.OwnerToken, v.PublishDate, v.VideoPrice, v.VideoToken, v.Visibility, v.Views, u.UserName as OwnerName, a.SportName
+    FROM videos AS v
+    JOIN users AS u ON v.OwnerToken = u.UserPublicToken
+    LEFT JOIN videos_category_alloc AS a ON v.VideoToken = a.VideoToken
+    WHERE v.VideoToken = "${req.params.VideoToken}";`;
 
     try {
         const connection = await req.pool?.promise().getConnection();
         const VideoData = await query(connection, GetVideoDataQueryString);
-
         if (Object.keys(VideoData).length === 0) {
             return res.status(202).json({
                 error: true,

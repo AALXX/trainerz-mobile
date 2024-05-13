@@ -15,6 +15,7 @@ router.post(
     body('VideoToken').not().isEmpty().trim(),
     body('VideoTitle').not().isEmpty().trim(),
     body('VideoDescription').not().isEmpty().trim(),
+    body('VideoSport').not().isEmpty().trim(),
     body('VideoPrice').not().isEmpty().trim(),
     body('Visibility').not().isEmpty().trim(),
     AccountVideoServices.UpdateVideoData,

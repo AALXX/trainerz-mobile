@@ -7,6 +7,7 @@ import { router, useLocalSearchParams } from 'expo-router'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import DropdownMenu from '../components/CommonUi/DropdownMenu'
 import { accLogout, deleteAccount } from './Auth/Auth'
+import Slider from '@react-native-community/slider'
 
 const AccountSettings = () => {
     const [userName, setUserName] = useState<string>('')
@@ -15,6 +16,7 @@ const AccountSettings = () => {
     const [description, setDescription] = useState<string>('')
     const [sport, setSport] = useState<string>('')
     const [accountType, setAccountType] = useState<string>('')
+    const [accountPrice, setAccountPrice] = useState<number>(0)
     const params = useLocalSearchParams()
 
     // const userToken: string = getCookie('userToken') as string
@@ -28,6 +30,7 @@ const AccountSettings = () => {
         setDescription(params.Description as string)
         setSport(params.Sport as string)
         setAccountType(params.AccountType as string)
+        setAccountPrice(+params.AccountPrice as number) //+ is here to convert to a positive number because typescript
     }, [])
 
     const changeUserData = async () => {
@@ -114,6 +117,14 @@ const AccountSettings = () => {
                     <Text className="text-sm text-white">Account Type</Text>
                     <DropdownMenu options={['Trainer', 'SportsPerson']} setOption={setAccountType} value={accountType} />
                 </View>
+
+                {accountType == 'Trainer' ? (
+                    <View className="flex w-[85%] self-center mt-10 h-16    ">
+                        <Text className="text-sm text-white">Account Pricing: ${accountPrice.toFixed(2)}</Text>
+
+                        <Slider minimumTrackTintColor={'#6e64c6'} thumbTintColor="#4f488c" minimumValue={0} maximumValue={100} step={1} value={accountPrice} onValueChange={setAccountPrice} />
+                    </View>
+                ) : null}
 
                 <TouchableOpacity
                     className="flex flex-row bg-[#3b366c]  border-none text-white mt-4 h-10 w-[90%] rounded-xl  hover:bg-[#525252] active:bg-[#2b2b2b]"

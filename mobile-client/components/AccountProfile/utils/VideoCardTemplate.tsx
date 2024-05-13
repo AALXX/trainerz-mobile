@@ -10,8 +10,9 @@ export interface IVideoTemplateProps {
     OwnerName: string
     OwnerToken: string
     ViwerToken: string
+    SportName: string
 }
-;``
+
 import { Image } from 'expo-image'
 import TruncatedText from './TruncatedText'
 import { abbreviateNumber } from './NumberAbrev'
@@ -28,10 +29,10 @@ const VideoCardTemplate = (props: IVideoTemplateProps) => {
                                 <Image source={`${process.env.EXPO_PUBLIC_FILE_SERVER}/${props.OwnerToken}/Main_Icon.png`} placeholder="acountImage" className=" rounded-full self-center w-12 h-12 ml-2" />
 
                                 <View className="flex flex-col self-center w-[40%]">
-                                    <Text className="text-white text-base ml-3">{props.OwnerName}</Text>
-                                    <View className="self-center h-[0.1vh] w-[85%] bg-white " />
+                                    <TruncatedText text={props.VideoTitle} characters={26} className="text-white text-lg ml-3" />
 
-                                    <TruncatedText text={props.VideoTitle} characters={26} className="text-white text-base ml-3" />
+                                    <View className="self-center h-[0.1vh] w-[90%] bg-white " />
+                                    <TruncatedText text={props.SportName} characters={18} className="text-white text-base ml-3" />
                                 </View>
 
                                 {props.ViwerToken === props.OwnerToken ? (
@@ -42,7 +43,12 @@ const VideoCardTemplate = (props: IVideoTemplateProps) => {
                                         <TouchableOpacity
                                             className="self-center"
                                             onPress={() => {
-                                                router.push('/EditVideoCourse')
+                                                router.push({
+                                                    pathname: '/EditVideoCourse',
+                                                    params: {
+                                                        VideoToken: props.VideoToken
+                                                    }
+                                                })
                                             }}
                                         >
                                             <Image source={require('../../../assets/AccountIcons/Settings_icon.svg')} placeholder="acountImage" className=" self-center  w-5 h-5 " />

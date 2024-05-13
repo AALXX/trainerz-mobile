@@ -4,7 +4,6 @@ import { CustomRequest, query } from '../../config/mysql';
 import logging from '../../config/logging';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
-import multer from 'multer';
 import fs from 'fs';
 import UtilFunc from '../../util/utilFunctions';
 
@@ -39,7 +38,8 @@ const GetUserAccountData = async (req: CustomRequest, res: Response) => {
 
     try {
         const connection = await req.pool?.promise().getConnection();
-        const GetUserDataQueryString = `SELECT UserName, Description, BirthDate, LocationCountry, LocationCity, Sport, UserEmail, UserVisibility, AccountType, UserPublicToken FROM users WHERE UserPrivateToken='${req.params.accountPrivateToken}';`;
+        const GetUserDataQueryString = `SELECT UserName, Description, BirthDate, AccountPrice, LocationCountry, LocationCity, Sport, UserEmail, UserVisibility, AccountType, UserPublicToken 
+        FROM users WHERE UserPrivateToken='${req.params.accountPrivateToken}';`;
 
         const data = await query(connection, GetUserDataQueryString);
         if (Object.keys(data).length === 0) {
@@ -129,12 +129,12 @@ const RegisterUser = async (req: CustomRequest, res: Response) => {
     const userPrivateToken = jwt.sign(privateData, jwtSecretKey);
 
     const userPublicToken = jwt.sign(publicData, `${process.env.ACCOUNT_REGISTER_SECRET}`);
-
     const InsertUserQueryString = `
-    INSERT INTO users (UserName, Description, BirthDate, LocationCountry, LocationCity, Sport, UserEmail, UserPwd, UserVisibility, AccountType, UserPrivateToken, UserPublicToken)
+    INSERT INTO users (UserName, Description, BirthDate, LocationCountry, LocationCity, Sport, UserEmail, UserPwd, UserVisibility, AccountType, AccountPrice, UserPrivateToken, UserPublicToken)
     VALUES('${req.body.userName}', '${req.body.description}', 
     '${req.body.userBirthDate}', '${req.body.locationCountry}', 
-    '${req.body.locationCity}', '${req.body.sport}', '${req.body.userEmail}', '${hashedpwd}', 'public', '${req.body.accountType}', '${userPrivateToken}', '${userPublicToken}');`;
+    '${req.body.locationCity}', '${req.body.sport}', '${req.body.userEmail}', '${hashedpwd}', 'public', '${req.body.accountType}',
+    '${req.body.accountPrice}',  '${userPrivateToken}', '${userPublicToken}');`;
 
     try {
         const connection = await req.pool?.promise().getConnection();

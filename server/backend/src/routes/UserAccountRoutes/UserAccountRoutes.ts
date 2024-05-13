@@ -12,11 +12,12 @@ router.post(
     body('userEmail').isEmail().not().isEmpty(),
     body('password').isLength({ min: 4 }).not().isEmpty().trim(),
     body('sport').not().isEmpty(),
+    body('accountPrice'),
     body('description'),
     body('accountType').not().isEmpty(),
     body('userBirthDate').not().isEmpty(),
-    body('locationCity').not().isEmpty(),
-    body('locationCountry').not().isEmpty(),
+    // body('locationCity').not().isEmpty(),
+    // body('locationCountry').not().isEmpty(),
     UserAccountServices.RegisterUser,
 );
 

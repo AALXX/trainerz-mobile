@@ -12,7 +12,7 @@ const TrainerTemplate = (props: IUserData) => {
     const router = useRouter()
     const [userPublicToken, setUserPublicToken] = useState<string>('')
     const [componentToShow, setComponentToShow] = useState<string>('Courses')
-    const [videosData, setVideosData] = useState<Array<IVideoTemplateProps>>([{ OwnerName: '', OwnerToken: '', VideoTitle: '', VideoToken: '', Views: 0, ViwerToken: '' }])
+    const [videosData, setVideosData] = useState<Array<IVideoTemplateProps>>([{ OwnerName: '', OwnerToken: '', VideoTitle: '', VideoToken: '', Views: 0, ViwerToken: '', SportName:'' }])
 
     const GetVideos = async () => {
         const userToken = (await AsyncStorage.getItem('userPublicToken')) as string
@@ -44,6 +44,7 @@ const TrainerTemplate = (props: IUserData) => {
                                         VideoToken={video.VideoToken}
                                         Views={video.Views}
                                         ViwerToken={userPublicToken}
+                                        SportName={video.SportName} 
                                     />
                                 ))}
                             </>
@@ -96,7 +97,7 @@ const TrainerTemplate = (props: IUserData) => {
             <Image
                 source={`${process.env.EXPO_PUBLIC_FILE_SERVER}/${props.UserPublicToken}/Main_Icon.png`}
                 placeholder="acountImage"
-                className="self-center mt-4 border"
+                className="self-center mt-4 "
                 style={{ width: 120, height: 120, borderRadius: 50 }}
             />
             <View className="flex flex-col">
@@ -108,14 +109,15 @@ const TrainerTemplate = (props: IUserData) => {
                         onPress={() => {
                             router.push({
                                 pathname: '/AccountSettings',
-                                params: {
-                                    UserName: props.UserName,
-                                    Description: props.Description,
-                                    UserEmail: props.UserEmail,
-                                    UserVisibility: props.UserVisibility,
-                                    AccountType: props.AccountType,
-                                    Sport: props.Sport
-                                }
+                                    params: {
+                                        UserName: props.UserName,
+                                        Description: props.Description,
+                                        UserEmail: props.UserEmail,
+                                        UserVisibility: props.UserVisibility,
+                                        AccountType: props.AccountType,
+                                        Sport: props.Sport,
+                                        AccountPrice: props.AccountPrice! 
+                                    }
                             })
                         }}
                     >
