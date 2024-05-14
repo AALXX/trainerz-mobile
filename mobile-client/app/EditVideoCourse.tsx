@@ -19,12 +19,12 @@ const EditVideoCourse = () => {
 
     const GetVideoData = async () => {
         const resp = await axios.get(`${process.env.EXPO_PUBLIC_SERVER_BACKEND}/videos-manager/get-video-data/${params.VideoToken}`)
-        setVideoTitle(resp.data.VideoData.VideoTitle)
-        setVideoDescription(resp.data.VideoData.VideoDescription)
-        setVideoPrice(resp.data.VideoData.VideoPrice)
-        setVideoSport(resp.data.VideoData.SportName)
-        setVisibility(resp.data.VideoData.Visibility)
-        if(resp.data.VideoData.VideoPrice > 0){
+        setVideoTitle(resp.data.VideoTitle)
+        setVideoDescription(resp.data.VideoDescription)
+        setVideoPrice(resp.data.VideoPrice)
+        setVideoSport(resp.data.SportName)
+        setVisibility(resp.data.Visibility)
+        if(resp.data.VideoPrice > 0){
             setCustomPrice(true);
         }
     }

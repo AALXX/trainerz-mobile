@@ -226,7 +226,19 @@ const LoginRegisterModal = () => {
             return alert('Please fill all the fields!')
         }
 
-        const succesfullRegister = await accRegisterFunc(registerUserName, registerEmail, registerPassword, registerRepetedPassword, description, sport, accountPrice, accountType, userBirthDate, locationCity, locationCountry)
+        const succesfullRegister = await accRegisterFunc(
+            registerUserName,
+            registerEmail,
+            registerPassword,
+            registerRepetedPassword,
+            description,
+            sport,
+            accountPrice,
+            accountType,
+            userBirthDate,
+            locationCity,
+            locationCountry
+        )
         if (succesfullRegister) {
             router.replace('/AccountProfile')
         }
@@ -235,9 +247,9 @@ const LoginRegisterModal = () => {
     return (
         <BackGroundView>
             {!registerForm ? (
-                <View className="flex h-full w-full">
+                <View className="flex h-full w-full ">
                     <View
-                        className="flex h-[80vh] bg-[#594ec0c9] w-[90%] self-center mt-10 rounded-3xl"
+                        className="flex h-[80vh] bg-[#594ec0c9] w-[90%]  rounded-3xl self-center mt-[5vh]"
                         style={{
                             overflow: 'hidden',
 
@@ -286,7 +298,7 @@ const LoginRegisterModal = () => {
             ) : (
                 <View className="w-full h-full flex ">
                     <View
-                        className="flex h-[80vh] bg-[#594ec0c9] w-[90%] self-center mt-10 rounded-3xl"
+                        className="flex h-[80vh] bg-[#594ec0c9] w-[90%]  rounded-3xl self-center mt-[5vh]"
                         style={{
                             overflow: 'hidden',
 

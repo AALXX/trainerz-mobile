@@ -58,13 +58,29 @@ function RootLayoutNav() {
                 <Stack.Screen
                     name="AccountSettings"
                     options={{
-                        presentation: 'modal'
+                        presentation: 'modal',
+                        headerStyle: {
+                            backgroundColor: '#3b366c'
+                        }
+                    }}
+                />
+                <Stack.Screen
+                    name="WatchVideo"
+                    options={{
+                        title: '',
+                        presentation: 'card',
+                        headerStyle: {
+                            backgroundColor: '#3b366c'
+                        }
                     }}
                 />
                 <Stack.Screen
                     name="EditVideoCourse"
                     options={{
-                        presentation: 'modal'
+                        presentation: 'modal',
+                        headerStyle: {
+                            backgroundColor: '#3b366c'
+                        }
                     }}
                 />
                 <Stack.Screen name="AddCourse" />

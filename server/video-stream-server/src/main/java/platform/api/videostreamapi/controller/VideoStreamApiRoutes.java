@@ -36,7 +36,7 @@ public class VideoStreamApiRoutes {
     }
 
     @GetMapping(value = "video-stream/{VideoToken}", produces = "video/mp4")
-    public Mono<Resource> GetVideo(@PathVariable String VideoToken, @RequestHeader("Range") String range) {
+    public Mono<Resource> GetVideo(@PathVariable String VideoToken) {
 
         List<VideoData> data = videoServices.GetVideoData(VideoToken);
         if (!data.isEmpty()) {

@@ -432,7 +432,15 @@ const GetVideoData = async (req: any, res: Response) => {
 
         return res.status(202).json({
             error: false,
-            VideoData: VideoData[0],
+            VideoTitle: VideoData[0].VideoTitle,
+            Views: VideoData[0].Views,
+            VideoDescription: VideoData[0].VideoDescription,
+            VideoPrice: VideoData[0].PublishDate,
+            PublishDate: VideoData[0].PublishDate,
+            SportName: VideoData[0].SportName,
+            OwnerToken: VideoData[0].OwnerToken,
+            OwnerName: VideoData[0].OwnerName,
+            Visibility: VideoData[0].Visibility,
         });
     } catch (error: any) {
         logging.error(NAMESPACE, error.message);
