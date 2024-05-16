@@ -4,7 +4,7 @@ import { Image } from 'expo-image'
 import { customPosition, playOrPauseVideo } from './utils/PlayerControls'
 import { IOverlayProps } from './utils/IVideos'
 
-const VideoPLayerOverlay = (props: IOverlayProps) => {
+const VideoPlayerOverlay = (props: IOverlayProps) => {
     return (
         <View className="flex flex-col w-full absolute h-full z-10 bg-[#00000065] ">
             <View className="flex-row justify-center">
@@ -80,4 +80,4 @@ const VideoPLayerOverlay = (props: IOverlayProps) => {
     )
 }
 
-export default VideoPLayerOverlay
+export default VideoPlayerOverlay

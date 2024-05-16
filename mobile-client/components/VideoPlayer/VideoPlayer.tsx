@@ -4,16 +4,15 @@ import { Image } from 'expo-image'
 import React, { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react'
 import { Video } from 'expo-av'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-// import VideoPLayerOverlay from './VideoPLayerOverlay'
 import { getVideoData } from './utils/PlayerControls'
 import { IVideoData } from './utils/IVideos'
-import VideoPLayerOverlay from './VideoPlayerOverlay'
+import VideoPlayerOverlay from './VideoPlayerOverlay'
+import axios from 'axios'
 
-const VideoPlayer = (props: { VideoToken: string; setFullScreen: Dispatch<SetStateAction<boolean>> }) => {
+const VideoPlayer = (props: { VideoToken: string }) => {
     const VideoRef = useRef<Video>(null)
     const [showOverlay, setShowOverlay] = useState(false)
-
-    const allTimeWatchRef = useRef<number>(0)
+    const [is20PercentReached, setIs20PercentReached] = useState(false)
 
     const [VideoData, setVideoData] = useState<IVideoData>({
         error: false,
@@ -42,40 +41,41 @@ const VideoPlayer = (props: { VideoToken: string; setFullScreen: Dispatch<SetSta
         ;(async () => {
             const videoData = await getVideoData(props.VideoToken)
             setVideoData(videoData)
-            // console.log(videoData)
-        
         })()
-
-        // const sendVideoAnalitycs = async () => {
-        //     if (Math.floor(allTimeWatchRef.current) > 3) {
-        //         const resp = await axios.post(`${process.env.SERVER_BACKEND}/videos-manager/update-video-alalytics`, {
-        //             WatchTime: allTimeWatchRef.current,
-        //             UserPublicToken: getCookie('userToken'),
-        //             VideoToken: props.VideoToken
-        //         })
-        //         console.log(resp)
-        //     }
-        // }
-
-        return () => {
-            // clearInterval(VideoChecks)
-            // await sendVideoAnalitycs()
-        }
     }, [props.VideoToken])
+
+    const sendVideoAnalitycs = async () => {
+        const resp = await axios.post(`${process.env.EXPO_PUBLIC_SERVER_BACKEND}/videos-manager/update-video-analytics`, {
+            WatchTime: playbackInstanceInfo.position,
+            UserPrivateToken: (await AsyncStorage.getItem('userToken')) as string,
+            VideoToken: props.VideoToken
+        })
+    }
 
     const updatePlaybackCallback = (status: any) => {
         if (status.isLoaded) {
-            console.log(status, 'status')
+            const currentPosition = status.positionMillis || 0
+            const duration = status.durationMillis || 0
+            const currentPercentage = (currentPosition / duration) * 100
+
             setPlaybackInstanceInfo({
-                position: status.positionMillis,
-                duration: status.durationMillis || 0,
+                position: currentPosition,
+                duration: duration,
                 state: status.didJustFinish ? 'Ended' : status.isBuffering ? 'Buffering' : status.shouldPlay ? 'Playing' : 'Paused'
             })
+
+            // Check if the playback position is greater than or equal to 20%
+            if (currentPercentage >= 20 && !is20PercentReached) {
+                // Add logic here to send analytics to the backend
+                ;(async () => {
+                    sendVideoAnalitycs()
+                })()
+                setIs20PercentReached(true) // Set a state to ensure analytics are sent only once
+            }
         } else {
             if (status.isLoaded === false && status.error) {
                 const errorMsg = `Encountered a fatal error during playback: ${status.error}`
-                console.log(errorMsg, 'error')
-                // setErrorMessage(errorMsg)
+                alert(errorMsg)
             }
         }
     }
@@ -90,7 +90,7 @@ const VideoPlayer = (props: { VideoToken: string; setFullScreen: Dispatch<SetSta
                     }}
                 >
                     {showOverlay ? (
-                        <VideoPLayerOverlay VideoRef={VideoRef} playbackInstanceInfo={playbackInstanceInfo} setFullscreen={props.setFullScreen} />
+                        <VideoPlayerOverlay VideoRef={VideoRef} playbackInstanceInfo={playbackInstanceInfo} />
                     ) : (
                         <View className="bg-red-700 h-[0.5vh]" style={{ width: `${(playbackInstanceInfo.position / playbackInstanceInfo.duration) * 100}%` }} />
                     )}
@@ -105,7 +105,7 @@ const VideoPlayer = (props: { VideoToken: string; setFullScreen: Dispatch<SetSta
                     />
                 </TouchableOpacity>
                 <View className="flex flex-row w-full h-[12vh] bg-[#0000008b]">
-                    <Image source={`${process.env.EXPO_PUBLIC_FILE_SERVER}/${VideoData.OwnerToken}/Main_Icon.png`} placeholder="acountImage" className="w-12 h-12 rounded-full mt-6 ml-2" />
+                    <Image source={`${process.env.EXPO_PUBLIC_FILE_SERVER}/${VideoData.OwnerToken}/Main_Icon.png`} placeholder="acountImage" className="w-12 h-12 rounded-full self-center ml-2" />
                     <View className="flex flex-col ml-2 h-full self-center   w-[80%] justify-center">
                         <Text className="text-white text-lg">{VideoData.VideoTitle}</Text>
                         <View className=" h-[0.1vh] bg-white full  mt-1" />

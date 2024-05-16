@@ -360,7 +360,6 @@ const UpdateVideoData = async (req: CustomRequest, res: Response) => {
     try {
         const connection = await req.pool?.promise().getConnection();
         const userPublicToken = await utilFunctions.getUserPublicTokenFromPrivateToken(req.pool!, req.body.UserPrivateToken);
-        console.log(req.body);
         if (userPublicToken == null) {
             return res.status(200).json({
                 error: true,

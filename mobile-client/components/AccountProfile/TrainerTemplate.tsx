@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, TextInput, ScrollView } from 'react-native'
+import { View, Text, TouchableOpacity, TextInput, ScrollView, RefreshControl } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { IUserData } from './IAccountProfile'
 import { Image } from 'expo-image'
@@ -12,7 +12,9 @@ const TrainerTemplate = (props: IUserData) => {
     const router = useRouter()
     const [userPublicToken, setUserPublicToken] = useState<string>('')
     const [componentToShow, setComponentToShow] = useState<string>('Courses')
-    const [videosData, setVideosData] = useState<Array<IVideoTemplateProps>>([{ OwnerName: '', OwnerToken: '', VideoTitle: '', VideoToken: '', Views: 0, ViwerToken: '', SportName:'' }])
+    const [videosData, setVideosData] = useState<Array<IVideoTemplateProps>>([{ OwnerName: '', OwnerToken: '', VideoTitle: '', VideoToken: '', Views: 0, ViwerToken: '', SportName: '' }])
+
+    const [refreshing, setRefreshing] = useState(false)
 
     const GetVideos = async () => {
         const userToken = (await AsyncStorage.getItem('userPublicToken')) as string
@@ -44,7 +46,7 @@ const TrainerTemplate = (props: IUserData) => {
                                         VideoToken={video.VideoToken}
                                         Views={video.Views}
                                         ViwerToken={userPublicToken}
-                                        SportName={video.SportName} 
+                                        SportName={video.SportName}
                                     />
                                 ))}
                             </>
@@ -86,20 +88,31 @@ const TrainerTemplate = (props: IUserData) => {
         }
     }
 
+    const handleRefresh = async () => {
+        setRefreshing(true)
+        await GetVideos()
+
+        setRefreshing(false)
+    }
+
     return (
-        <ScrollView>
+        <ScrollView
+            refreshControl={
+                <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={async () => {
+                        await handleRefresh()
+                    }}
+                />
+            }
+        >
             <View className="w-full h-[12vh] bg-[#1b1b1b3a] flex  flex-row  items-center">
                 <Text className="self-center text-white mt-10 font-bold ml-4">TRAINERZ</Text>
                 <TouchableOpacity className="ml-auto mt-9 mr-4" onPress={() => router.push('/AddCourse')}>
                     <Image source={require('../../assets/AccountIcons/Upload_Icon.svg')} className="  w-7 h-7 self-center" alt="SettingIcon" />
                 </TouchableOpacity>
             </View>
-            <Image
-                source={`${process.env.EXPO_PUBLIC_FILE_SERVER}/${props.UserPublicToken}/Main_Icon.png`}
-                placeholder="acountImage"
-                className="self-center mt-4 "
-                style={{ width: 120, height: 120, borderRadius: 50 }}
-            />
+            <Image source={`${process.env.EXPO_PUBLIC_FILE_SERVER}/${props.UserPublicToken}/Main_Icon.png`} placeholder="acountImage" className="self-center mt-4 " style={{ width: 120, height: 120, borderRadius: 50 }} />
             <View className="flex flex-col">
                 <View className="flex flex-row justify-center ">
                     <Text className="self-center  text-xl text-white mt-2 ">{props.UserName}</Text>
@@ -109,15 +122,15 @@ const TrainerTemplate = (props: IUserData) => {
                         onPress={() => {
                             router.push({
                                 pathname: '/AccountSettings',
-                                    params: {
-                                        UserName: props.UserName,
-                                        Description: props.Description,
-                                        UserEmail: props.UserEmail,
-                                        UserVisibility: props.UserVisibility,
-                                        AccountType: props.AccountType,
-                                        Sport: props.Sport,
-                                        AccountPrice: props.AccountPrice! 
-                                    }
+                                params: {
+                                    UserName: props.UserName,
+                                    Description: props.Description,
+                                    UserEmail: props.UserEmail,
+                                    UserVisibility: props.UserVisibility,
+                                    AccountType: props.AccountType,
+                                    Sport: props.Sport,
+                                    AccountPrice: props.AccountPrice!
+                                }
                             })
                         }}
                     >

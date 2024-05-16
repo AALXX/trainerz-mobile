@@ -1,6 +1,7 @@
 import express from 'express';
 import { body, param } from 'express-validator';
 import AccountVideoServices from '../../Services/VideoServices/AccountVideosServiceManager';
+import ClientVideosServices from '../../Services/VideoServices/ClientVideosServiceManager';
 
 const router = express.Router();
 
@@ -20,5 +21,12 @@ router.post(
     body('Visibility').not().isEmpty().trim(),
     AccountVideoServices.UpdateVideoData,
 );
+
+// *comment related
+router.get('/get-video-comments/:videoToken', param('videoToken').not().isEmpty(), ClientVideosServices.GetVideoComments);
+router.post('/update-video-analytics', body('WatchTime').not().isEmpty(), body('UserPrivateToken').not().isEmpty(), body('VideoToken').not().isEmpty(), ClientVideosServices.UpdateVideoAnalytics);
+
+router.post('/post-comment', body('UserPrivateToken').not().isEmpty(), body('VideoToken').not().isEmpty(), body('Comment').not().isEmpty(), ClientVideosServices.PostCommentToVideo);
+router.post('/delete-comment', body('UserPrivateToken').not().isEmpty(), body('VideoToken').not().isEmpty(), body('CommentID').not().isEmpty(), ClientVideosServices.DeleteComment);
 
 export = router;

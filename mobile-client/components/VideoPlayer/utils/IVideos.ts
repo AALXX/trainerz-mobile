@@ -17,5 +17,4 @@ export interface IVideoData {
 export interface IOverlayProps {
     VideoRef: RefObject<Video>
     playbackInstanceInfo: any
-    setFullscreen: Dispatch<SetStateAction<boolean>>
 }

@@ -4,12 +4,12 @@ import { BackGroundView, View } from '../components/Themed'
 import React, { useEffect, useState } from 'react'
 import { useLocalSearchParams } from 'expo-router'
 import VideoPlayer from '../components/VideoPlayer/VideoPlayer'
+import CommentSection from '../components/VideoPlayer/CommentSection/CommentSection'
 
 const WatchVideo = () => {
     const params = useLocalSearchParams()
     const [refreshing, setRefreshing] = useState<boolean>(false)
     const [refreshKey, setRefreshKey] = useState<number>(0)
-    const [fullScreen, setFullScreen] = useState<boolean>(false)
 
     const handleRefresh = async () => {
         setRefreshing(true)
@@ -31,13 +31,8 @@ const WatchVideo = () => {
                     />
                 }
             >
-                {fullScreen ? null : (
-                    // <FullScreenVideoPlayer key={refreshKey} VideoToken={VideoToken} setFullScreen={setFullScreen} />
-                    <View>
-                        <VideoPlayer key={refreshKey} VideoToken={params.VideoToken as string} setFullScreen={setFullScreen} />
-                        {/* <CommenView VideoToken={VideoToken} /> */}
-                    </View>
-                )}
+                <VideoPlayer key={refreshKey} VideoToken={params.VideoToken as string} />
+                <CommentSection VideoToken={params.VideoToken as string} />
             </ScrollView>
         </BackGroundView>
     )
