@@ -6,21 +6,23 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-    "github.com/joho/godotenv"
-	
-	"os"
+	"github.com/joho/godotenv"
+
 	"log"
+	"os"
 )
 
 func main() {
-	// Load the environment variables from the .env file
-    err := godotenv.Load()
-    if err != nil {
-        log.Fatalf("Error loading .env file: %v", err)
-    }
 
-		// Specify the folder path you want to delete
-	folderPath := "videos_index/"
+	// Load the environment variables from the .env file
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatalf("Error loading .env file: %v", err)
+	}
+
+
+	// Specify the folder path you want to delete
+	folderPath := "users_index/"
 
 	// Attempt to remove the folder and its contents
 	ferr := os.RemoveAll(folderPath)
@@ -40,6 +42,7 @@ func main() {
 	// Create a Gin router
 	router := gin.Default()
 
+
 	// Initialize the Bleve index
 	index, err := config.InitializeIndex()
 	if err != nil {
@@ -47,13 +50,13 @@ func main() {
 	}
 
 	// Retrieve data from MySQL (replace this with your database query)
-	videos, err := config.RetrieveDataFromMySQL(db)
+	users, err := config.RetrieveDataFromMySQL(db)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// Index the retrieved data into the Bleve index
-	err = config.IndexData(index, videos)
+	err = config.IndexData(index, users)
 	if err != nil {
 		log.Fatal(err)
 	}

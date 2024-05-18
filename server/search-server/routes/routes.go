@@ -16,15 +16,15 @@ func InitRoutes(router *gin.Engine, db *sql.DB, index bleve.Index) {
 			controllers.GetSerchedVideos(c, db, index)
 		})
 
-		userGroup.POST("/index-video", func(c *gin.Context) {
+		userGroup.POST("/index-user", func(c *gin.Context) {
 			controllers.AddToIndex(c, db, index)
 		})
 
-		userGroup.POST("/update-indexed-video", func(c *gin.Context) {
+		userGroup.POST("/update-indexed-user", func(c *gin.Context) {
 			controllers.UpdateIndexedVideo(c, db, index)
 		})
 
-		userGroup.POST("/delete-indexed-video", func(c *gin.Context) {
+		userGroup.POST("/delete-indexed-user", func(c *gin.Context) {
 			controllers.DeleteIndexedVideo(c, db, index)
 		})
 	}

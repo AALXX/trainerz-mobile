@@ -17,10 +17,3 @@ type Video struct {
 	VideoToken      string `json:"VideoToken"`
 	VideoVisibility string `json:"VideoVisibility"`
 }
-
-type SearchResult struct {
-	VideoTitle      string
-	VideoToken      string
-	VideoVisibility string
-	Score           float64
-}

@@ -78,10 +78,10 @@ async fn analyze_and_insert_ratings(
     // Insert user ratings into the ratings table
     let mut conn = pool.get_conn().unwrap();
     let insert_query = "INSERT INTO ratings (UserToken, AccountViews, Rating)
-                        VALUES (:user_token, :account_views, :rating)
-                        ON DUPLICATE KEY UPDATE
-                        AccountViews = VALUES(AccountViews),
-                        Rating = VALUES(Rating)";
+                    VALUES (:user_token, :account_views, :rating)
+                    ON DUPLICATE KEY UPDATE
+                    AccountViews = VALUES(AccountViews),
+                    Rating = VALUES(Rating)";
 
     for user_rating in user_ratings {
         conn.exec_drop(

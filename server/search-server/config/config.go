@@ -47,9 +47,9 @@ func InitDB() (*sql.DB, error) {
 func InitializeIndex() (bleve.Index, error) {
 	// Create or open a Bleve index
 	mapping := bleve.NewIndexMapping()
-	index, err := bleve.Open("videos_index")
+	index, err := bleve.Open("users_index")
 	if err != nil {
-		index, err = bleve.New("videos_index", mapping)
+		index, err = bleve.New("users_index", mapping)
 		if err != nil {
 			return nil, err
 		}
@@ -57,44 +57,47 @@ func InitializeIndex() (bleve.Index, error) {
 	return index, nil
 }
 
-func RetrieveDataFromMySQL(db *sql.DB) ([]models.Video, error) {
-	rows, err := db.Query("SELECT  VideoTitle, VideoToken, Visibility FROM users")
+func RetrieveDataFromMySQL(db *sql.DB) ([]models.User, error) {
+	rows, err := db.Query("SELECT u.UserName, u.Sport, u.UserPublicToken, u.AccountType, COALESCE(r.Rating, 0) AS Rating FROM users u LEFT JOIN ratings r ON u.UserPublicToken = r.UserToken;")
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	var videos []models.Video
+	var users []models.User
 
 	for rows.Next() {
-		var video models.Video
+		var user models.User
 
-		if err := rows.Scan(&video.VideoTitle, &video.VideoToken, &video.VideoVisibility); err != nil {
+		if err := rows.Scan(&user.UserName, &user.Sport, &user.UserPublicToken, &user.AccountType, &user.Rating); err != nil {
 			return nil, err
 		}
 
-		videos = append(videos, video)
+		users = append(users, user)
 	}
 
 	if err := rows.Err(); err != nil {
 		return nil, err
 	}
 
-	return videos, nil
+	return users, nil
 }
 
-func IndexData(index bleve.Index, videos []models.Video) error {
+func IndexData(index bleve.Index, users []models.User) error {
 	// Index data from the MySQL database
-	for i := 0; i < len(videos); i++ {
+	for i := 0; i < len(users); i++ {
 
 		// Create a Bleve document as a map
 		bleveDoc := map[string]interface{}{
-			"VideoToken":      videos[i].VideoToken,
-			"VideoTitle":      videos[i].VideoTitle,
-			"VideoVisibility": videos[i].VideoVisibility,
+			"UserName":        users[i].UserName,
+			"UserPublicToken": users[i].UserPublicToken,
+			"AccountType":          users[i].AccountType,
+			"Rating":          users[i].Rating,
+			"Sport":           users[i].Sport,
 		}
+
 		// Index the document
-		if err := index.Index(videos[i].VideoToken, bleveDoc); err != nil {
+		if err := index.Index(users[i].UserName, bleveDoc); err != nil {
 			return err
 		}
 	}
