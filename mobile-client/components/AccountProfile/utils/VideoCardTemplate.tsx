@@ -3,6 +3,10 @@ import React from 'react'
 import { Link } from 'expo-router'
 import { useRouter } from 'expo-router'
 
+import { Image } from 'expo-image'
+import TruncatedText from './TruncatedText'
+import { abbreviateNumber } from './NumberAbrev'
+
 export interface IVideoTemplateProps {
     VideoTitle: string
     VideoToken: string
@@ -12,10 +16,6 @@ export interface IVideoTemplateProps {
     ViwerToken: string
     SportName: string
 }
-
-import { Image } from 'expo-image'
-import TruncatedText from './TruncatedText'
-import { abbreviateNumber } from './NumberAbrev'
 
 const VideoCardTemplate = (props: IVideoTemplateProps) => {
     const router = useRouter()

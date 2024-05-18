@@ -84,6 +84,7 @@ function RootLayoutNav() {
                     }}
                 />
                 <Stack.Screen name="AddCourse" />
+                <Stack.Screen name="AddPhoto" />
             </Stack>
         </ThemeProvider>
     )

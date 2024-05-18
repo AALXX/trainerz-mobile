@@ -33,7 +33,7 @@ router.post('/login-account', body('userEmail').isEmail().not().isEmpty(), body(
 //     UserAccountServices.ChangeUserPasswod,
 // );
 
-// //* Account data
+//* Account data
 router.get('/get-account-data/:accountPrivateToken', param('accountPrivateToken').not().isEmpty(), UserAccountServices.GetUserAccountData);
 
 router.post(
@@ -48,11 +48,13 @@ router.post(
     UserAccountServices.ChangeUserData,
 );
 
+router.post('/upload-user-image', UserAccountServices.UploadPhoto);
+
+router.get('/get-account-photos/:accountPublicToken', param('accountPublicToken').not().isEmpty(), UserAccountServices.GetAccountPhotos);
+
+
 // router.post('/delete-user-account', body('userToken').not().isEmpty(), UserAccountServices.DeleteUserAccount);
 
 // router.post('/change-user-icon', UserAccountServices.ChangeUserIcon);
-
-// router.post('/upload-user-image', UserAccountServices.UploadImage);
-
 
 export = router;

@@ -6,8 +6,31 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import fs from 'fs';
 import UtilFunc from '../../util/utilFunctions';
+import multer from 'multer';
 
 const NAMESPACE = 'UserAccountService';
+
+/**
+ * file storage
+ */
+const storage = multer.diskStorage({
+    destination: (req: CustomRequest, file: any, callback: any) => {
+        callback(null, `${process.env.ACCOUNTS_FOLDER_PATH}/PhotosTmp`);
+    },
+
+    filename: (req: CustomRequest, file, cb: any) => {
+        cb(null, `${file.originalname}`);
+    },
+});
+
+const fileFilter = (req: CustomRequest, file: any, cb: any) => {
+    // reject all files except jpeg
+    if (file.mimetype === 'image/jpeg') {
+        cb(null, true);
+    } else {
+        cb(null, false);
+    }
+};
 
 /**
  * Validates and cleans the CustomRequest form
@@ -220,9 +243,99 @@ const LoginUser = async (req: CustomRequest, res: Response) => {
     }
 };
 
+const PhotoUploader = multer({
+    storage: storage,
+    fileFilter: fileFilter,
+}).single('photo');
+
+const UploadPhoto = async (req: CustomRequest, res: Response) => {
+    PhotoUploader(req, res, async (err: any) => {
+        if (err) {
+            return res.status(200).json({
+                msg: 'falied to upload',
+                error: true,
+            });
+        }
+
+        // console.log(req.file);
+
+        const userPublicToken = await UtilFunc.getUserPublicTokenFromPrivateToken(req.pool!, req.body.UserPrivateToken);
+        if (userPublicToken == null) {
+            return res.status(200).json({
+                error: true,
+            });
+        }
+
+        const PhotoToken = UtilFunc.CreateVideoToken();
+
+        //* Directory Created Succesfully
+        fs.rename(`${process.env.ACCOUNTS_FOLDER_PATH}/PhotosTmp/${req.file?.originalname}`, `${process.env.ACCOUNTS_FOLDER_PATH}/${userPublicToken}/${PhotoToken}.png`, async (err) => {
+            if (err) {
+                logging.error(NAMESPACE, err.message);
+
+                return res.status(200).json({
+                    error: true,
+                });
+            }
+
+            try {
+                const connection = await req.pool?.promise().getConnection();
+                const sendVideoCategoryToDbSQl = `INSERT INTO photos (PublishDate, Description, PhotoToken, OwnerToken, Visibility) VALUES (CURDATE(),'${req.body.description}', '${PhotoToken}', '${userPublicToken}', 'public')`;
+                await query(connection, sendVideoCategoryToDbSQl);
+
+                return res.status(200).json({
+                    error: false,
+                });
+            } catch (error) {
+                return res.status(200).json({
+                    error: true,
+                });
+            }
+        });
+    });
+};
+
+const GetAccountPhotos = async (req: CustomRequest, res: Response) => {
+    const errors = CustomRequestValidationResult(req);
+    if (!errors.isEmpty()) {
+        errors.array().map((error) => {
+            logging.error('GET_ACCOUNT_DATA', error.errorMsg);
+        });
+
+        return res.status(200).json({ error: true, errors: errors.array() });
+    }
+
+    try {
+        const connection = await req.pool?.promise().getConnection();
+        const GetUserDataQueryString = `SELECT * FROM photos WHERE OwnerToken='${req.params.accountPublicToken}';`;
+
+        const data = await query(connection, GetUserDataQueryString);
+        if (Object.keys(data).length === 0) {
+            return res.status(200).json({
+                error: false,
+                photosData: null,
+            });
+        }
+
+        return res.status(200).json({
+            error: false,
+            photosData: data,
+        });
+    } catch (error: any) {
+        logging.error(NAMESPACE, error.message);
+
+        res.status(202).json({
+            error: true,
+            errmsg: error.message,
+        });
+    }
+};
+
 export default {
     GetUserAccountData,
     ChangeUserData,
     RegisterUser,
     LoginUser,
+    UploadPhoto,
+    GetAccountPhotos,
 };

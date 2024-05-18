@@ -5,9 +5,8 @@ import multer from 'multer';
 import logging from '../../config/logging';
 import { CustomRequest, query } from '../../config/mysql';
 
-import axios from 'axios';
 import utilFunctions from '../../util/utilFunctions';
-import { validationResult, param, body } from 'express-validator';
+import { validationResult } from 'express-validator';
 import fs from 'fs';
 import FFmpeg from 'fluent-ffmpeg';
 
@@ -299,10 +298,6 @@ const VideoProceesor = async (srcPath: string, dstPath: string, numThreads: numb
         });
     });
 
-// ////////////////////////////////
-//      Video Creator Data       //
-// ////////////////////////////////
-
 /**
  * Retrieves the list of videos owned by the user with the specified public token.
  *
@@ -400,59 +395,8 @@ const UpdateVideoData = async (req: CustomRequest, res: Response) => {
     }
 };
 
-// ////////////////////////////////
-//      Video Client             //
-// ////////////////////////////////
-const GetVideoData = async (req: any, res: Response) => {
-    const errors = CustomRequestValidationResult(req);
-    if (!errors.isEmpty()) {
-        errors.array().map((error) => {
-            logging.error('GET_VIDEO_DATA_FUNC', error.errorMsg);
-        });
-
-        return res.status(200).json({ error: true, errors: errors.array() });
-    }
-
-
-    const GetVideoDataQueryString = `SELECT v.VideoTitle, v.VideoDescription, v.OwnerToken, v.PublishDate, v.VideoPrice, v.VideoToken, v.Visibility, v.Views, u.UserName as OwnerName, a.SportName
-    FROM videos AS v
-    JOIN users AS u ON v.OwnerToken = u.UserPublicToken
-    LEFT JOIN videos_category_alloc AS a ON v.VideoToken = a.VideoToken
-    WHERE v.VideoToken = "${req.params.VideoToken}";`;
-
-    try {
-        const connection = await req.pool?.promise().getConnection();
-        const VideoData = await query(connection, GetVideoDataQueryString);
-        if (Object.keys(VideoData).length === 0) {
-            return res.status(202).json({
-                error: true,
-            });
-        }
-
-        return res.status(202).json({
-            error: false,
-            VideoTitle: VideoData[0].VideoTitle,
-            Views: VideoData[0].Views,
-            VideoDescription: VideoData[0].VideoDescription,
-            VideoPrice: VideoData[0].PublishDate,
-            PublishDate: VideoData[0].PublishDate,
-            SportName: VideoData[0].SportName,
-            OwnerToken: VideoData[0].OwnerToken,
-            OwnerName: VideoData[0].OwnerName,
-            Visibility: VideoData[0].Visibility,
-        });
-    } catch (error: any) {
-        logging.error(NAMESPACE, error.message);
-        return res.status(500).json({
-            message: error.message,
-            error: true,
-        });
-    }
-};
-
 export default {
     UploadVideoFileToServer,
     UpdateVideoData,
     GetAccountVideos,
-    GetVideoData,
 };

@@ -50,7 +50,7 @@ export default function TabLayout() {
                         <Image
                             source={`${process.env.EXPO_PUBLIC_FILE_SERVER}/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2NzQ2NzkxMjZ9.8wWitGJAELNTcTFwcsDejqp2lV0AtD5oVo2s3CxGXE4/Main_Icon.png`}
                             placeholder="acountImage"
-                            className=" mt-3 border"
+                            className=" mt-3"
                             style={{ width: 40, height: 40, borderRadius: 25 }}
                         />
                     ),

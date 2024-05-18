@@ -20,7 +20,7 @@ const TrainerTemplate = (props: IUserData) => {
         const userToken = (await AsyncStorage.getItem('userPublicToken')) as string
         setUserPublicToken(userToken)
 
-        const resp = await axios.get(`${process.env.EXPO_PUBLIC_SERVER_BACKEND}/videos-manager/get-account-videos/${userToken}`)
+        const resp = await axios.get(`${process.env.EXPO_PUBLIC_SERVER_BACKEND}/videos-manager/get-account-videos/${props.UserPublicToken}`)
         setVideosData(resp.data.VideosData)
     }
 
@@ -112,30 +112,31 @@ const TrainerTemplate = (props: IUserData) => {
                     <Image source={require('../../assets/AccountIcons/Upload_Icon.svg')} className="  w-7 h-7 self-center" alt="SettingIcon" />
                 </TouchableOpacity>
             </View>
-            <Image source={`${process.env.EXPO_PUBLIC_FILE_SERVER}/${props.UserPublicToken}/Main_Icon.png`} placeholder="acountImage" className="self-center mt-4 " style={{ width: 120, height: 120, borderRadius: 50 }} />
+            <Image source={`${process.env.EXPO_PUBLIC_FILE_SERVER}/${userPublicToken}/Main_Icon.png`} placeholder="acountImage" className="self-center mt-4 " style={{ width: 120, height: 120, borderRadius: 50 }} />
             <View className="flex flex-col">
                 <View className="flex flex-row justify-center ">
                     <Text className="self-center  text-xl text-white mt-2 ">{props.UserName}</Text>
-
-                    <TouchableOpacity
-                        className="self-center mt-3"
-                        onPress={() => {
-                            router.push({
-                                pathname: '/AccountSettings',
-                                params: {
-                                    UserName: props.UserName,
-                                    Description: props.Description,
-                                    UserEmail: props.UserEmail,
-                                    UserVisibility: props.UserVisibility,
-                                    AccountType: props.AccountType,
-                                    Sport: props.Sport,
-                                    AccountPrice: props.AccountPrice!
-                                }
-                            })
-                        }}
-                    >
-                        <Image source={require('../../assets/AccountIcons/Settings_icon.svg')} className="ml-1 w-6 h-6 self-center" alt="SettingIcon" />
-                    </TouchableOpacity>
+                    {props.UserPublicToken === userPublicToken && (
+                        <TouchableOpacity
+                            className="self-center mt-3"
+                            onPress={() => {
+                                router.push({
+                                    pathname: '/AccountSettings',
+                                    params: {
+                                        UserName: props.UserName,
+                                        Description: props.Description,
+                                        UserEmail: props.UserEmail,
+                                        UserVisibility: props.UserVisibility,
+                                        AccountType: props.AccountType,
+                                        Sport: props.Sport,
+                                        AccountPrice: props.AccountPrice!
+                                    }
+                                })
+                            }}
+                        >
+                            <Image source={require('../../assets/AccountIcons/Settings_icon.svg')} className="ml-1 w-6 h-6 self-center" alt="SettingIcon" />
+                        </TouchableOpacity>
+                    )}
                 </View>
                 <Text className="m-auto mt-2 text-white">Trainer</Text>
             </View>

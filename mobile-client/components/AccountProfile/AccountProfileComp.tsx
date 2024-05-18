@@ -1,4 +1,4 @@
-import {  View } from '../Themed'
+import { View } from '../Themed'
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -22,7 +22,7 @@ const AccountProfile = () => {
         Sport: '',
         UserVisibility: '',
         UserPublicToken: '',
-        AccountPrice: 0,
+        AccountPrice: 0
     })
 
     const getProfileData = async (userToken: string | null) => {
@@ -34,7 +34,6 @@ const AccountProfile = () => {
     }
 
     useEffect(() => {
-        //TODO Change this
         if (params.UpdateData === 'true') {
             handleRefresh()
         }
@@ -43,7 +42,6 @@ const AccountProfile = () => {
          * Get user profile Data
          */
         ;(async () => {
-            
             const profileData = await getProfileData(await AsyncStorage.getItem('userToken'))
             setUserData(profileData.userData)
         })()
@@ -69,12 +67,23 @@ const AccountProfile = () => {
                     Sport={userData.Sport}
                     UserEmail={userData.UserEmail}
                     UserName={userData.UserName}
-                    UserVisibility={userData.UserVisibility}
                     UserPublicToken={userData.UserPublicToken}
+                    UserVisibility={userData.UserVisibility}
                     AccountPrice={userData.AccountPrice}
                 />
             ) : (
-                <AthelteTemplate />
+                <AthelteTemplate
+                    AccountType={userData.AccountType}
+                    BirthDate={userData.BirthDate}
+                    Description={userData.Description}
+                    LocationCity={userData.LocationCity}
+                    LocationCountry={userData.LocationCountry}
+                    Sport={userData.Sport}
+                    UserEmail={userData.UserEmail}
+                    UserName={userData.UserName}
+                    UserPublicToken={userData.UserPublicToken}
+                    UserVisibility={userData.UserVisibility}
+                />
             )}
         </View>
     )

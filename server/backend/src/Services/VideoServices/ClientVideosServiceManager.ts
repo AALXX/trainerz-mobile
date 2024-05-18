@@ -15,6 +15,52 @@ const CustomRequestValidationResult = validationResult.withDefaults({
     },
 });
 
+const GetVideoData = async (req: any, res: Response) => {
+    const errors = CustomRequestValidationResult(req);
+    if (!errors.isEmpty()) {
+        errors.array().map((error) => {
+            logging.error('GET_VIDEO_DATA_FUNC', error.errorMsg);
+        });
+
+        return res.status(200).json({ error: true, errors: errors.array() });
+    }
+
+    const GetVideoDataQueryString = `SELECT v.VideoTitle, v.VideoDescription, v.OwnerToken, v.PublishDate, v.VideoPrice, v.VideoToken, v.Visibility, v.Views, u.UserName as OwnerName, a.SportName
+    FROM videos AS v
+    JOIN users AS u ON v.OwnerToken = u.UserPublicToken
+    LEFT JOIN videos_category_alloc AS a ON v.VideoToken = a.VideoToken
+    WHERE v.VideoToken = "${req.params.VideoToken}";`;
+
+    try {
+        const connection = await req.pool?.promise().getConnection();
+        const VideoData = await query(connection, GetVideoDataQueryString);
+        if (Object.keys(VideoData).length === 0) {
+            return res.status(202).json({
+                error: true,
+            });
+        }
+
+        return res.status(202).json({
+            error: false,
+            VideoTitle: VideoData[0].VideoTitle,
+            Views: VideoData[0].Views,
+            VideoDescription: VideoData[0].VideoDescription,
+            VideoPrice: VideoData[0].PublishDate,
+            PublishDate: VideoData[0].PublishDate,
+            SportName: VideoData[0].SportName,
+            OwnerToken: VideoData[0].OwnerToken,
+            OwnerName: VideoData[0].OwnerName,
+            Visibility: VideoData[0].Visibility,
+        });
+    } catch (error: any) {
+        logging.error('GET_VIDEO_DATA_FUNC', error.message);
+        return res.status(500).json({
+            message: error.message,
+            error: true,
+        });
+    }
+};
+
 /**
  * Post a comment to a video.
  * @param {CustomRequest} req - The request object containing the user token and video token.
@@ -42,7 +88,7 @@ const PostCommentToVideo = async (req: CustomRequest, res: Response) => {
             });
         }
 
-        const PostCommentSQL = `-- Insert the comment into the comments table
+        const PostCommentSQL = `
         INSERT INTO comments (ownerToken, videoToken, comment, SentAt) 
         VALUES ("${ownerToken}","${req.body.VideoToken}", "${req.body.Comment}", CURDATE());
 
@@ -254,4 +300,4 @@ const SearchVideo = async (req: CustomRequest, res: Response) => {
     }
 };
 
-export default { GetVideoComments, PostCommentToVideo, DeleteComment, SearchVideo, UpdateVideoAnalytics };
+export default { GetVideoComments, PostCommentToVideo, DeleteComment, SearchVideo, UpdateVideoAnalytics, GetVideoData };
