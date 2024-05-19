@@ -24,7 +24,6 @@ const AthelteTemplate = (props: IUserData) => {
             const dateB = new Date(b.PublishDate).getTime()
             return dateB - dateA // Newest first
         })
-        console.log(sortedPhotos)
         setPhotos(sortedPhotos)
     }
 

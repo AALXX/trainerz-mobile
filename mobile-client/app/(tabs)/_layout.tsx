@@ -33,7 +33,7 @@ export default function TabLayout() {
                     tabBarStyle: {
                         backgroundColor: '#5f56b2'
                     },
-                    tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+                    tabBarIcon: () => <Image source={require('../../assets/Search_Icon.svg')} className="  w-8 h-8 self-center" alt="SettingIcon" />,
                     tabBarBackground: () => <View className="bg-[#5f56b2] opacity-60 w-full h-full" />
                 }}
             />

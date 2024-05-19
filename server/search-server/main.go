@@ -71,5 +71,5 @@ func main() {
 	routes.InitRoutes(router, db, index)
 
 	// Start the server
-	router.Run("localhost:7300")
+	router.Run("192.168.72.81:7300")
 }
