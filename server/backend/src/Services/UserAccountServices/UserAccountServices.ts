@@ -7,6 +7,7 @@ import bcrypt from 'bcrypt';
 import fs from 'fs';
 import UtilFunc from '../../util/utilFunctions';
 import multer from 'multer';
+import axios from 'axios';
 
 const NAMESPACE = 'UserAccountService';
 
@@ -112,6 +113,19 @@ const ChangeUserData = async (req: CustomRequest, res: Response) => {
         AccountType='${req.body.accountType}',
         userVisibility='${req.body.userVisibility}' WHERE UserPrivateToken='${req.body.userPrivateToken}';`;
         await query(connection, changeUserDataSQL);
+
+        const searchServerResp = await axios.post(`${process.env.SEARCH_SERVER}/update-indexed-user`, {
+            UserName: req.body.userName,
+            UserPrivateToken: req.body.userPrivateToken,
+            Sport: req.body.sport,
+            AccountType: req.body.accountType,
+        });
+
+        if (searchServerResp.data.error === false) {
+            res.status(202).json({
+                error: true,
+            });
+        }
 
         res.status(202).json({
             error: false,

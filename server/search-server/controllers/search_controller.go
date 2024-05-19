@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"net/http"
-	// "search-server/config"
+	"search-server/config"
 	"search-server/models"
 
 	"github.com/blevesearch/bleve"
@@ -111,62 +111,59 @@ func AddToIndex(c *gin.Context, db *sql.DB, index bleve.Index) {
 	c.JSON(http.StatusCreated, gin.H{"error": false})
 }
 
-func UpdateIndexedVideo(c *gin.Context, db *sql.DB, index bleve.Index) {
+func UpdateIndexedUser(c *gin.Context, db *sql.DB, index bleve.Index) {
 
-	// var video models.VideoReq
-	// if err := c.ShouldBindJSON(&video); err != nil {
-	// 	c.JSON(http.StatusBadRequest, gin.H{"error": true, "msg": err.Error()})
-	// 	return
-	// }
+	var user models.UserReq
+	if err := c.ShouldBindJSON(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": true, "msg": err.Error()})
+		return
+	}
 
-	// if !config.VideoOwnerTokenCheck(UserPublicToken, video.VideoToken, db) {
+	var UserPublicToken = config.GetPublicTokenByPrivateToken(user.UserPrivateToken, db)
 
-	// 	c.JSON(http.StatusCreated, gin.H{"error": true})
-	// 	return
-	// }
+	var rating = config.GetAccountRating(UserPublicToken, db)
 
-	// newVideo := models.Video{
-	// 	VideoTitle:      video.VideoTitle,
-	// 	VideoToken:      video.VideoToken,
-	// 	VideoVisibility: video.VideoVisibility,
-	// }
+	newUser := models.User{
+		UserName:        user.UserName,
+		UserPublicToken: UserPublicToken,
+		Rating:          rating,
+		Sport:           user.Sport,
+		AccountType:     user.AccountType,
+	}
 
-	// // First, remove the old document from the index.
-	// if err := index.Delete(video.VideoToken); err != nil {
-	// 	log.Fatal(err)
-	// 	c.JSON(http.StatusCreated, gin.H{"error": true})
-	// 	return
-	// }
+	log.Println(newUser)		
 
-	// if err := index.Index(video.VideoToken, newVideo); err != nil {
-	// 	log.Fatal(err)
-	// 	c.JSON(http.StatusCreated, gin.H{"error": true})
-	// 	return
-	// }
+	// First, remove the old document from the index.
+	if err := index.Delete(UserPublicToken); err != nil {
+		log.Fatal(err)
+		c.JSON(http.StatusCreated, gin.H{"error": true})
+		return
+	}
+
+	if err := index.Index(UserPublicToken, newUser); err != nil {
+		log.Fatal(err)
+		c.JSON(http.StatusCreated, gin.H{"error": true})
+		return
+	}
 
 	c.JSON(http.StatusCreated, gin.H{"error": false})
 }
 
-func DeleteIndexedVideo(c *gin.Context, db *sql.DB, index bleve.Index) {
+func DeleteIndexedUser(c *gin.Context, db *sql.DB, index bleve.Index) {
 
-	// var video models.VideoReq
-	// if err := c.ShouldBindJSON(&video); err != nil {
-	// 	c.JSON(http.StatusBadRequest, gin.H{"error": true, "msg": err.Error()})
-	// 	return
-	// }
+	var user models.UserReq
+	if err := c.ShouldBindJSON(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": true, "msg": err.Error()})
+		return
+	}
 
-	// var UserPublicToken = config.GetPublicTokenByPrivateToken(video.UserPrivateToken, db)
-	// if config.VideoOwnerTokenCheck(UserPublicToken, video.VideoToken, db) == false {
-	// 	log.Println("ERROR")
-	// 	c.JSON(http.StatusCreated, gin.H{"error": true})
-	// 	return
-	// }
+	var UserPublicToken = config.GetPublicTokenByPrivateToken(user.UserPrivateToken, db)
 
-	// // First, remove the old document from the index.
-	// if err := index.Delete(video.VideoToken); err != nil {
-	// 	log.Fatal(err)
-	// 	c.JSON(http.StatusCreated, gin.H{"error": true})
-	// 	return
-	// }
+	// First, remove the old document from the index.
+	if err := index.Delete(UserPublicToken); err != nil {
+		log.Fatal(err)
+		c.JSON(http.StatusCreated, gin.H{"error": true})
+		return
+	}
 	c.JSON(http.StatusCreated, gin.H{"error": false})
 }

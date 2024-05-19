@@ -21,11 +21,11 @@ func InitRoutes(router *gin.Engine, db *sql.DB, index bleve.Index) {
 		})
 
 		userGroup.POST("/update-indexed-user", func(c *gin.Context) {
-			controllers.UpdateIndexedVideo(c, db, index)
+			controllers.UpdateIndexedUser(c, db, index)
 		})
 
 		userGroup.POST("/delete-indexed-user", func(c *gin.Context) {
-			controllers.DeleteIndexedVideo(c, db, index)
+			controllers.DeleteIndexedUser(c, db, index)
 		})
 	}
 }

@@ -2,7 +2,6 @@ package config
 
 import (
 	"database/sql"
-	"log"
 	"os"
 
 	"fmt"
@@ -97,7 +96,7 @@ func IndexData(index bleve.Index, users []models.User) error {
 		}
 
 		// Index the document
-		if err := index.Index(users[i].UserName, bleveDoc); err != nil {
+		if err := index.Index(users[i].UserPublicToken, bleveDoc); err != nil {
 			return err
 		}
 	}
@@ -136,32 +135,25 @@ func GetPublicTokenByPrivateToken(PrivateToken string, db *sql.DB) string {
 
 	return userPublicToken
 }
-
-func VideoOwnerTokenCheck(UserPublicToken string, VideoToken string, db *sql.DB) bool {
-	log.Printf(UserPublicToken)
-	log.Printf(VideoToken)
-	rows, err := db.Query("SELECT OwnerToken FROM videos WHERE VideoToken=?;", VideoToken)
+func GetAccountRating(PublicToken string, db *sql.DB) int {
+	rows, err := db.Query("select Rating from ratings WHERE UserToken=?;", PublicToken)
 	if err != nil {
-		return false
+		return 0
 	}
 	defer rows.Close()
 
-	var OwnerToken string
+	var Rating int
 
 	for rows.Next() {
-		if err := rows.Scan(&OwnerToken); err != nil {
-			return false
+		if err := rows.Scan(&Rating); err != nil {
+			return 0
 		}
 	}
-	log.Printf(OwnerToken)
 
 	if err := rows.Err(); err != nil {
-		return false
+		return 0
 	}
 
-	if OwnerToken == UserPublicToken {
-		return true
-	}
-
-	return false
+	return Rating
 }
+
