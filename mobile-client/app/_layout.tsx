@@ -83,6 +83,15 @@ function RootLayoutNav() {
                         }
                     }}
                 />
+                <Stack.Screen
+                    name="ViewProfile"
+                    options={{
+                        presentation: 'card',
+                        headerStyle: {
+                            backgroundColor: '#3b366c'
+                        }
+                    }}
+                />
                 <Stack.Screen name="AddCourse" />
                 <Stack.Screen name="AddPhoto" />
             </Stack>

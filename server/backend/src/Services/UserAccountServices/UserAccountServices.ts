@@ -88,6 +88,50 @@ const GetUserAccountData = async (req: CustomRequest, res: Response) => {
 };
 
 /**
+ * Gets a personal user account data by User Private Token
+ * @param {CustomRequest} req
+ * @param {Response} res
+ * @return {Response}
+ */
+const GetUserAccountPublicData = async (req: CustomRequest, res: Response) => {
+    const errors = CustomRequestValidationResult(req);
+    if (!errors.isEmpty()) {
+        errors.array().map((error) => {
+            logging.error('GET_ACCOUNT_DATA', error.errorMsg);
+        });
+
+        return res.status(200).json({ error: true, errors: errors.array() });
+    }
+
+    try {
+        const connection = await req.pool?.promise().getConnection();
+        const GetUserDataQueryString = `SELECT UserName, Description, AccountPrice, Sport, UserEmail, UserVisibility, AccountType 
+        FROM users WHERE UserPublicToken='${req.params.accountPublicToken}';`;
+
+        const data = await query(connection, GetUserDataQueryString);
+        if (Object.keys(data).length === 0) {
+            return res.status(200).json({
+                error: false,
+                userData: null,
+            });
+        }
+
+        return res.status(200).json({
+            error: false,
+            userData: data[0],
+        });
+    } catch (error: any) {
+        logging.error(NAMESPACE, error.message);
+
+        res.status(202).json({
+            error: true,
+            errmsg: error.message,
+        });
+    }
+};
+
+
+/**
  * Change  users data
  * @param {CustomRequest} req
  * @param {Response} res
@@ -347,6 +391,7 @@ const GetAccountPhotos = async (req: CustomRequest, res: Response) => {
 
 export default {
     GetUserAccountData,
+    GetUserAccountPublicData,
     ChangeUserData,
     RegisterUser,
     LoginUser,

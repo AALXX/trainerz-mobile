@@ -7,7 +7,7 @@ import { IUserData } from './IAccountProfile'
 import TrainerTemplate from './TrainerTemplate'
 import AthelteTemplate from './AthelteTemplate'
 
-const AccountProfile = () => {
+const AccountView = (props: { UserPublicToken: string }) => {
     const [refreshing, setRefreshing] = useState(false)
     const params = useLocalSearchParams()
 
@@ -25,8 +25,8 @@ const AccountProfile = () => {
         AccountPrice: 0
     })
 
-    const getProfileData = async (userToken: string | null) => {
-        const resData = await axios.get(`${process.env.EXPO_PUBLIC_SERVER_BACKEND}/user-account-manager/get-account-data/${userToken}`)
+    const getProfileData = async () => {
+        const resData = await axios.get(`${process.env.EXPO_PUBLIC_SERVER_BACKEND}/user-account-manager/get-account-public-data/${props.UserPublicToken}`)
         if (resData.data.error == true) {
             return console.error('ERROR GET PROFILE DATA FAILED')
         }
@@ -42,14 +42,14 @@ const AccountProfile = () => {
          * Get user profile Data
          */
         ;(async () => {
-            const profileData = await getProfileData(await AsyncStorage.getItem('userToken'))
+            const profileData = await getProfileData()
             setUserData(profileData.userData)
         })()
     }, [])
 
     const handleRefresh = async () => {
         setRefreshing(true)
-        const profileData = await getProfileData(await AsyncStorage.getItem('userToken'))
+        const profileData = await getProfileData()
         setUserData(profileData.userData)
 
         setRefreshing(false)
@@ -67,7 +67,7 @@ const AccountProfile = () => {
                     Sport={userData.Sport}
                     UserEmail={userData.UserEmail}
                     UserName={userData.UserName}
-                    UserPublicToken={userData.UserPublicToken}
+                    UserPublicToken={props.UserPublicToken}
                     UserVisibility={userData.UserVisibility}
                     AccountPrice={userData.AccountPrice}
                 />
@@ -81,7 +81,7 @@ const AccountProfile = () => {
                     Sport={userData.Sport}
                     UserEmail={userData.UserEmail}
                     UserName={userData.UserName}
-                    UserPublicToken={userData.UserPublicToken}
+                    UserPublicToken={props.UserPublicToken}
                     UserVisibility={userData.UserVisibility}
                 />
             )}
@@ -89,4 +89,4 @@ const AccountProfile = () => {
     )
 }
 
-export default AccountProfile
+export default AccountView

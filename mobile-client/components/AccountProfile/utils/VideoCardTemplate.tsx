@@ -46,7 +46,7 @@ const VideoCardTemplate = (props: IVideoTemplateProps) => {
                                 <TruncatedText text={props.SportName} characters={18} className="text-white text-base ml-3" />
                             </View>
 
-                            {props.ViwerToken === props.OwnerToken ? (
+                            {props.ViwerToken === props.OwnerToken || props.ViwerToken === null ? (
                                 <View className="h-full ml-auto mr-5 flex-row">
                                     <Text className="text-white self-center text-lg mr-2 ">{abbreviateNumber(props.Views)}</Text>
                                     <Image source={require('../../../assets/VideoIcons/Views_icon.svg')} className=" self-center  w-5 h-5 mr-2" />

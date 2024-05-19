@@ -12,7 +12,7 @@ const TrainerTemplate = (props: IUserData) => {
     const router = useRouter()
     const [userPublicToken, setUserPublicToken] = useState<string>('')
     const [componentToShow, setComponentToShow] = useState<string>('Courses')
-    const [videosData, setVideosData] = useState<Array<IVideoTemplateProps>>([{ OwnerName: '', OwnerToken: '', VideoTitle: '', VideoToken: '', Views: 0, ViwerToken: '', SportName: '' }])
+    const [videosData, setVideosData] = useState<Array<IVideoTemplateProps>>([])
 
     const [refreshing, setRefreshing] = useState(false)
 
@@ -106,12 +106,14 @@ const TrainerTemplate = (props: IUserData) => {
                 />
             }
         >
-            <View className="w-full h-[12vh] bg-[#1b1b1b3a] flex  flex-row  items-center">
-                <Text className="self-center text-white mt-10 font-bold ml-4">TRAINERZ</Text>
-                <TouchableOpacity className="ml-auto mt-9 mr-4" onPress={() => router.push('/AddCourse')}>
-                    <Image source={require('../../assets/AccountIcons/Upload_Icon.svg')} className="  w-7 h-7 self-center" alt="SettingIcon" />
-                </TouchableOpacity>
-            </View>
+            {props.UserPublicToken == userPublicToken ? (
+                <View className="w-full h-[12vh] bg-[#1b1b1b3a] flex  flex-row  items-center">
+                    <Text className="self-center text-white mt-10 font-bold ml-4">TRAINERZ</Text>
+                    <TouchableOpacity className="ml-auto mt-9 mr-4" onPress={() => router.push('/AddCourse')}>
+                        <Image source={require('../../assets/AccountIcons/Upload_Icon.svg')} className="  w-7 h-7 self-center" alt="SettingIcon" />
+                    </TouchableOpacity>
+                </View>
+            ) : null}
             <Image source={`${process.env.EXPO_PUBLIC_FILE_SERVER}/${userPublicToken}/Main_Icon.png`} placeholder="acountImage" className="self-center mt-4 " style={{ width: 120, height: 120, borderRadius: 50 }} />
             <View className="flex flex-col">
                 <View className="flex flex-row justify-center ">
