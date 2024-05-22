@@ -32,7 +32,6 @@ const HashPassword = async (password: string) => {
     return null;
 };
 
-
 /**
  ** checks if username and email exists in database
  * @param {string} UserName
@@ -70,7 +69,6 @@ const UserNameAndEmailExistCheck = (UserName: string, Email: string, callback: a
     //     });
 };
 
-
 /**
  * Get User Private token by provided public Token
  * @param {string} userToken
@@ -78,7 +76,7 @@ const UserNameAndEmailExistCheck = (UserName: string, Email: string, callback: a
  */
 const getUserPrivateTokenFromPublicToken = async (pool: mysql.Pool, userToken: string): Promise<string | null> => {
     const NAMESPACE = 'GET_USER_PRIVATE_TOKEN_FUNC';
-    const CheckIfUserFollwsAccountQuerryString = `SELECT UserPrivateToken FROM users WHERE UserPublicToken="${userToken}";`;
+    const GetPricateTokebnQuerryString = `SELECT UserPrivateToken FROM users WHERE UserPublicToken="${userToken}";`;
 
     try {
         if (userToken === 'undefined') {
@@ -86,10 +84,36 @@ const getUserPrivateTokenFromPublicToken = async (pool: mysql.Pool, userToken: s
         }
         const connection = await pool.promise().getConnection();
 
-        const checkfollowResponse = await query(connection, CheckIfUserFollwsAccountQuerryString);
-        let userData = JSON.parse(JSON.stringify(checkfollowResponse));
+        const Response = await query(connection, GetPricateTokebnQuerryString);
+        const userData = JSON.parse(JSON.stringify(Response));
         if (Object.keys(userData).length != 0) {
             return userData[0].UserPrivateToken;
+        } else {
+            return null;
+        }
+    } catch (error: any) {
+        logging.error(NAMESPACE, error.message, error);
+        return null;
+    }
+};
+/**
+ * Get Email From Private token
+ * @param {string} userPrivateToken
+ * @param {mysql.Pool} pool
+ * @return {Promise<string | null>}
+ */
+const getUserEmailFromPrivateToken = async (pool: mysql.Pool, userPrivateToken: string): Promise<string | null> => {
+    const NAMESPACE = 'GET_USER_EMAIL_FUNC';
+    const CheckIfUserFollwsAccountQuerryString = `SELECT UserEmail FROM users WHERE UserPrivateToken="${userPrivateToken}";`;
+
+    try {
+        if (userPrivateToken === 'undefined') {
+            return null;
+        }
+        const connection = await pool.promise().getConnection();
+        const userData = await query(connection, CheckIfUserFollwsAccountQuerryString);
+        if (Object.keys(userData).length != 0) {
+            return userData[0].UserEmail;
         } else {
             return null;
         }
@@ -423,6 +447,7 @@ export default {
     getUserRole,
     checkIfUserIsBlocked,
     userFollowAccountCheck,
+    getUserEmailFromPrivateToken,
     getUserLikedOrDislikedVideo,
     getUserPublicTokenFromPrivateToken,
     getUserLikedOrDislikedStream,

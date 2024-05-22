@@ -130,7 +130,6 @@ const GetUserAccountPublicData = async (req: CustomRequest, res: Response) => {
     }
 };
 
-
 /**
  * Change  users data
  * @param {CustomRequest} req
@@ -220,11 +219,39 @@ const RegisterUser = async (req: CustomRequest, res: Response) => {
     try {
         const connection = await req.pool?.promise().getConnection();
         await query(connection, InsertUserQueryString);
-        fs.mkdir(`../accounts/${userPublicToken}/`, (err) => {
+        fs.mkdir(`../accounts/${userPublicToken}/`, async (err) => {
             if (err) {
                 return res.status(200).json({
                     error: true,
                 });
+            }
+
+            if (req.body.accountType === 'Trainer') {
+                const product = await req.stripe?.products.create({ name: req.body.userName, metadata: { PublicToken: userPublicToken } });
+                if (product!.id != null) {
+                    await req.stripe?.prices.create({
+                        product: product!.id,
+                        unit_amount: req.body.accountPrice * 100, // Amount in cents (e.g., $15.00)
+                        currency: 'usd',
+                        recurring: {
+                            interval: 'month',
+                        },
+                    });
+                }
+            }
+            await req.stripe?.customers.create({
+                email: req.body.userEmail,
+                name: req.body.userName,
+            });
+
+            const resp = await axios.post(`${process.env.SEARCH_SERVER}/index-user`, {
+                UserName: req.body.userName,
+                UserPrivateToken: userPrivateToken,
+                Sport: req.body.sport,
+            });
+
+            if (resp.data.error == true) {
+                console.log('error');
             }
 
             res.status(202).json({

@@ -89,20 +89,25 @@ func GetSerchedVideos(c *gin.Context, db *sql.DB, index bleve.Index) {
 
 func AddToIndex(c *gin.Context, db *sql.DB, index bleve.Index) {
 
-	var user models.User
+	var user models.UserReq
 	if err := c.ShouldBindJSON(&user); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": true, "msg": err.Error()})
 		return
 	}
 
-	newVideo := models.User{
+	var UserPublicToken = config.GetPublicTokenByPrivateToken(user.UserPrivateToken, db)
+	var rating = config.GetAccountRating(UserPublicToken, db)
+
+	newUser := models.User{
 		UserName:        user.UserName,
-		UserPublicToken: user.UserPublicToken,
-		Rating:          user.Rating,
+		UserPublicToken: UserPublicToken,
+		Rating:          rating,
 		Sport:           user.Sport,
+		AccountType:     user.AccountType,
 	}
 
-	if err := index.Index(user.UserPublicToken, newVideo); err != nil {
+
+	if err := index.Index(UserPublicToken, newUser); err != nil {
 		log.Fatal(err)
 		c.JSON(http.StatusCreated, gin.H{"error": true})
 		return
@@ -130,8 +135,6 @@ func UpdateIndexedUser(c *gin.Context, db *sql.DB, index bleve.Index) {
 		Sport:           user.Sport,
 		AccountType:     user.AccountType,
 	}
-
-	log.Println(newUser)		
 
 	// First, remove the old document from the index.
 	if err := index.Delete(UserPublicToken); err != nil {

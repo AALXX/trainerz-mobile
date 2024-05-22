@@ -6,7 +6,7 @@ import { useLocalSearchParams } from 'expo-router'
 
 const ViewProfile = () => {
     const params = useLocalSearchParams()
-
+    
     return (
         <BackGroundView>
             <View className="h-full">

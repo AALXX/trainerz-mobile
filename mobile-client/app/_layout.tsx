@@ -2,8 +2,9 @@ import FontAwesome from '@expo/vector-icons/FontAwesome'
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native'
 import { useFonts } from 'expo-font'
 import { SplashScreen, Stack } from 'expo-router'
-import { useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { useColorScheme } from 'react-native'
+import { StripeProvider } from '@stripe/stripe-react-native'
 
 export {
     // Catch any errors thrown by the Layout component.
@@ -46,55 +47,66 @@ function RootLayoutNav() {
     const colorScheme = useColorScheme()
 
     return (
-        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-            <Stack>
-                <Stack.Screen
-                    name="(tabs)"
-                    options={{
-                        headerShown: false
-                    }}
-                />
-                <Stack.Screen name="LoginRegisterModal" options={{ presentation: 'modal', title: 'Login/Register' }} />
-                <Stack.Screen
-                    name="AccountSettings"
-                    options={{
-                        presentation: 'modal',
-                        headerStyle: {
-                            backgroundColor: '#3b366c'
-                        }
-                    }}
-                />
-                <Stack.Screen
-                    name="WatchVideo"
-                    options={{
-                        title: '',
-                        presentation: 'card',
-                        headerStyle: {
-                            backgroundColor: '#3b366c'
-                        }
-                    }}
-                />
-                <Stack.Screen
-                    name="EditVideoCourse"
-                    options={{
-                        presentation: 'modal',
-                        headerStyle: {
-                            backgroundColor: '#3b366c'
-                        }
-                    }}
-                />
-                <Stack.Screen
-                    name="ViewProfile"
-                    options={{
-                        presentation: 'card',
-                        headerStyle: {
-                            backgroundColor: '#3b366c'
-                        }
-                    }}
-                />
-                <Stack.Screen name="AddCourse" />
-                <Stack.Screen name="AddPhoto" />
-            </Stack>
-        </ThemeProvider>
+        <StripeProvider publishableKey={`${process.env.EXPO_PUBLIC_STRIPE_KEY}`}>
+            <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+                <Stack>
+                    <Stack.Screen
+                        name="(tabs)"
+                        options={{
+                            headerShown: false
+                        }}
+                    />
+                    <Stack.Screen name="LoginRegisterModal" options={{ presentation: 'modal', title: 'Login/Register' }} />
+                    <Stack.Screen
+                        name="AccountSettings"
+                        options={{
+                            presentation: 'modal',
+                            headerStyle: {
+                                backgroundColor: '#3b366c'
+                            }
+                        }}
+                    />
+                    <Stack.Screen
+                        name="WatchVideo"
+                        options={{
+                            title: '',
+                            presentation: 'card',
+                            headerStyle: {
+                                backgroundColor: '#3b366c'
+                            }
+                        }}
+                    />
+                    <Stack.Screen
+                        name="EditVideoCourse"
+                        options={{
+                            presentation: 'modal',
+                            headerStyle: {
+                                backgroundColor: '#3b366c'
+                            }
+                        }}
+                    />
+                    <Stack.Screen
+                        name="ViewProfile"
+                        options={{
+                            presentation: 'card',
+                            headerStyle: {
+                                backgroundColor: '#3b366c'
+                            }
+                        }}
+                    />
+                    <Stack.Screen
+                        name="Payment"
+                        options={{
+                            presentation: 'card',
+                            headerStyle: {
+                                backgroundColor: '#3b366c'
+                            }
+                        }}
+                    />
+                    <Stack.Screen name="AddCourse" />
+                    <Stack.Screen name="AddPhoto" />
+                </Stack>
+            </ThemeProvider>
+        </StripeProvider>
     )
 }

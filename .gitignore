@@ -7,7 +7,7 @@ server/backend/.pnp
 server/backend/.pnp.js
 mobile-client/node_modules
 mobile-client/.expo
-mobile-client/.vscode
+./mobile-client/.env
 .mono
 
 # next.js

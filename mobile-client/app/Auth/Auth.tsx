@@ -23,7 +23,7 @@ const accRegisterFunc = async (
     description: string,
     sport: string,
     accountPrice: number,
-    accountType:string,
+    accountType: string,
     userBirthDate: Date,
     locationCity: string,
     locationCountry: string
@@ -81,7 +81,6 @@ const accLoginFunc = async (userEmail: string, password: string) => {
     return false
 }
 
-
 /**
  * Logs the user out by removing the user's token from AsyncStorage and reloading the window.
  * This function should be called when the user wants to log out of the application.
@@ -112,6 +111,22 @@ const isLoggedIn = async () => {
 }
 
 /**
+ * Checks if the user is subscribed to a specific account.
+ *
+ * @param AccountPublicToken - The public token of the account to check for subscription.
+ * @returns A boolean indicating whether the user is subscribed to the specified account.
+ */
+const isSubscribed = async (AccountPublicToken: string): Promise<boolean> => {
+    const userToken = await AsyncStorage.getItem('userToken')
+    const res = await axios.post(`${process.env.EXPO_PUBLIC_SERVER_BACKEND}/payment-manager/check-subscription`, {
+        UserPrivateToken: userToken,
+        AccountPublicToken: AccountPublicToken
+    })
+
+    return res.data.isSubscribed
+}
+
+/**
  * Deletes the user's account if the user confirms the action.
  *
  * @param sure - A boolean indicating whether the user has confirmed the account deletion.
@@ -133,4 +148,4 @@ const deleteAccount = async (sure: boolean, UserPrivateToken: string) => {
     return true
 }
 
-export { accRegisterFunc, accLoginFunc, accLogout, isLoggedIn, deleteAccount }
+export { accRegisterFunc, accLoginFunc, accLogout, isLoggedIn, isSubscribed, deleteAccount }

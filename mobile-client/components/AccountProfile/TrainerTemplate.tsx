@@ -7,13 +7,14 @@ import ProfileCards from './utils/ProfileCards'
 import axios from 'axios'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import VideoCardTemplate, { IVideoTemplateProps } from './utils/VideoCardTemplate'
+import { isSubscribed } from '../../app/Auth/Auth'
 
 const TrainerTemplate = (props: IUserData) => {
     const router = useRouter()
     const [userPublicToken, setUserPublicToken] = useState<string>('')
     const [componentToShow, setComponentToShow] = useState<string>('Courses')
     const [videosData, setVideosData] = useState<Array<IVideoTemplateProps>>([])
-
+    const [subscribed, setSubscribed] = useState(false)
     const [refreshing, setRefreshing] = useState(false)
 
     const GetVideos = async () => {
@@ -24,11 +25,27 @@ const TrainerTemplate = (props: IUserData) => {
         setVideosData(resp.data.VideosData)
     }
 
+    const CancelSubscription = async () => {
+        const userToken = (await AsyncStorage.getItem('userToken')) as string
+
+        const resp = await axios.post(`${process.env.EXPO_PUBLIC_SERVER_BACKEND}/payment-manager/cancel-subscription`, {
+            UserPrivateToken: userToken,
+            AccountPublicToken: props.UserPublicToken
+        })
+
+        if (resp.data.error == true) {
+            alert('error has ocurred')
+        }
+
+        setSubscribed(false)
+    }
+
     useEffect(() => {
         ;(async () => {
             await GetVideos()
+            setSubscribed(await isSubscribed(props.UserPublicToken))
         })()
-    }, [])
+    }, [props.UserPublicToken])
 
     const renderComponent = () => {
         switch (componentToShow) {
@@ -91,6 +108,7 @@ const TrainerTemplate = (props: IUserData) => {
     const handleRefresh = async () => {
         setRefreshing(true)
         await GetVideos()
+        setSubscribed(await isSubscribed(props.UserPublicToken))
 
         setRefreshing(false)
     }
@@ -140,7 +158,40 @@ const TrainerTemplate = (props: IUserData) => {
                         </TouchableOpacity>
                     )}
                 </View>
-                <Text className="m-auto mt-2 text-white">Trainer</Text>
+                {props.UserPublicToken == userPublicToken ? (
+                    <Text className="m-auto  text-white">Trainer: {props.AccountPrice}$</Text>
+                ) : (
+                    <>
+                        {subscribed ? (
+                            <View className="flex flex-row justify-center">
+                                <TouchableOpacity
+                                    className="mt-2 rounded-xl bg-[#6e1f1f9e] w-40 h-8"
+                                    onPress={async () => {
+                                        await CancelSubscription()
+                                    }}
+                                >
+                                    <Text className="m-auto  text-white">Trainer: Unsubscribe</Text>
+                                </TouchableOpacity>
+                            </View>
+                        ) : (
+                            <View className="flex flex-row justify-center">
+                                <TouchableOpacity
+                                    className="mt-2 rounded-xl bg-[#00000056] w-40 h-8"
+                                    onPress={() => {
+                                        router.push({
+                                            pathname: '/Payment',
+                                            params: {
+                                                UserPublicToken: props.UserPublicToken
+                                            }
+                                        })
+                                    }}
+                                >
+                                    <Text className="m-auto  text-white">Trainer: Subscribe {props.AccountPrice}$</Text>
+                                </TouchableOpacity>
+                            </View>
+                        )}
+                    </>
+                )}
             </View>
 
             <View className="mt-8">

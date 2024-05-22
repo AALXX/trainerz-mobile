@@ -1,7 +1,6 @@
 import { View } from '../Themed'
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useLocalSearchParams } from 'expo-router'
 import { IUserData } from './IAccountProfile'
 import TrainerTemplate from './TrainerTemplate'
@@ -37,11 +36,10 @@ const AccountView = (props: { UserPublicToken: string }) => {
         if (params.UpdateData === 'true') {
             handleRefresh()
         }
-
+        
         /**
          * Get user profile Data
-         */
-        ;(async () => {
+         */ ;(async () => {
             const profileData = await getProfileData()
             setUserData(profileData.userData)
         })()

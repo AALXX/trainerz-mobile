@@ -2,9 +2,11 @@ import mysql from 'mysql2';
 import config from './config';
 import logging from './logging';
 import express from 'express';
+import Stripe from 'stripe';
 
 interface CustomRequest extends express.Request {
     pool?: mysql.Pool;
+    stripe?: Stripe;
 }
 
 const createPool = () => {
@@ -39,6 +41,7 @@ const query = async (connection: any, queryString: string, values?: any[]): Prom
 
 /**
  * connects to an sql server
+ * @param {mysql.Pool} pool
  * @return {Promise<mysql.Connection>}
  */
 const connect = async (pool: mysql.Pool) => {

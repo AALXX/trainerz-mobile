@@ -15,8 +15,9 @@ const AthelteTemplate = (props: IUserData) => {
     const [refreshing, setRefreshing] = useState(false)
 
     const GetPhotos = async () => {
+        if(props.UserPublicToken === '') return
         const resp = await axios.get(`${process.env.EXPO_PUBLIC_SERVER_BACKEND}/user-account-manager/get-account-photos/${props.UserPublicToken}`)
-        setPhotos(resp.data.photosData)
+        if (resp.data.photosData !== null) setPhotos(resp.data.photosData)
     }
 
     useEffect(() => {
@@ -25,7 +26,7 @@ const AthelteTemplate = (props: IUserData) => {
             setUserPublicToken(userToken)
             await GetPhotos()
         })()
-    }, [])
+    }, [props.UserPublicToken])
 
     const handleRefresh = async () => {
         setRefreshing(true)

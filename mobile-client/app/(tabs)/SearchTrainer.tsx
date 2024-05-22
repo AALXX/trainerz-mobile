@@ -14,7 +14,6 @@ const SearchTrainer = () => {
 
     const SearchReq = async () => {
         const resp = await axios.get(`${process.env.EXPO_PUBLIC_SEARCH_SERVER}/search/${searchInput}`)
-        console.log(resp.data.usersResults)
         if (resp.data.usersResults !== null) {
             setAccInfo(resp.data.usersResults)
         }
