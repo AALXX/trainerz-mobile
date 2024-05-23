@@ -22,9 +22,9 @@ const SearchTrainer = () => {
     return (
         <BackGroundView>
             <View className="w-full h-full">
-                <NavBar />
+                <NavBar TabTitle="Find Trainer/Athlete" />
                 <View className="flex flex-row bg-[#00000065] rounded-2xl h-12 w-[95%] mt-8  self-center">
-                    <TextInput className="text-white h-full self-center indent-3 w-[88%] " placeholder="Comment..." value={searchInput} onChangeText={text => setSearchInput(text)} />
+                    <TextInput className="text-white h-full self-center indent-3 w-[88%] " placeholder="Search Trainer/Athlete..." value={searchInput} onChangeText={text => setSearchInput(text)} />
                     <TouchableOpacity
                         className="flex justify-center w-10 h-full ml-auto"
                         onPress={async () => {

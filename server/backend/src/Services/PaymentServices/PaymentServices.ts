@@ -86,7 +86,6 @@ const CheckSubscription = async (req: CustomRequest, res: Response) => {
         if (UserEmail != null) {
             const customers = await req.stripe?.customers.list({ email: UserEmail });
             const products = await req.stripe?.products.list();
-            // Find the product with the matching name
             const product = products!.data.find((p) => p.metadata.PublicToken === req.body.AccountPublicToken);
             // Retrieve all subscriptions for the customer
             if (customers != null && product != null) {

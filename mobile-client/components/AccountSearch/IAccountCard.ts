@@ -3,5 +3,5 @@ export interface IAccountCard {
     UserPublicToken: string
     Sport: string
     AccountType: string
-    Rating: string
+    Rating: number
 }

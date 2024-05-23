@@ -1,18 +1,20 @@
 import { TouchableOpacity, Text, View } from 'react-native'
 import { Image } from 'expo-image'
-
-import React, { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react'
+import { useRouter } from 'expo-router'
+import React, { useEffect, useRef, useState } from 'react'
 import { Video } from 'expo-av'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { getVideoData } from './utils/PlayerControls'
 import { IVideoData } from './utils/IVideos'
 import VideoPlayerOverlay from './VideoPlayerOverlay'
 import axios from 'axios'
+import { isSubscribed } from '../../app/Auth/Auth'
 
 const VideoPlayer = (props: { VideoToken: string }) => {
     const VideoRef = useRef<Video>(null)
     const [showOverlay, setShowOverlay] = useState(false)
     const [is20PercentReached, setIs20PercentReached] = useState(false)
+    const router = useRouter()
 
     const [VideoData, setVideoData] = useState<IVideoData>({
         error: false,
@@ -38,8 +40,14 @@ const VideoPlayer = (props: { VideoToken: string }) => {
             alert('video no found')
         }
 
+        
         ;(async () => {
             const videoData = await getVideoData(props.VideoToken)
+            const isSubbed = await isSubscribed(videoData.OwnerToken)
+            if (isSubbed){
+                alert('You don\'t have acces to this video')
+                router.back()
+            } 
             setVideoData(videoData)
         })()
     }, [props.VideoToken])

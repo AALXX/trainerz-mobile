@@ -28,10 +28,12 @@ const AccountCard = (props: IAccountCard) => {
                 <View className="justify-center ml-2">
                     <Text className="self-center text-white mb-1">{props.UserName}</Text>
                     <View className="bg-white h-[0.1vh]" />
-                    <Text className="self-center text-white mt-1">{props.AccountType}: {props.Sport}</Text>
+                    <Text className="self-center text-white mt-1">
+                        {props.AccountType}: {props.Sport}
+                    </Text>
                 </View>
                 <View className="flex flex-row justify-center items-center ml-auto mr-2">
-                    <Text className="text-white text-lg ml-auto mr-2 self-center">{props.Rating}/5</Text>
+                    {props.Rating == null ? <Text className="text-white text-lg ml-auto mr-2 self-center">0/5</Text> : <Text className="text-white text-lg ml-auto mr-2 self-center">{props.Rating}/5</Text>}
                     <Image source={require('../../assets/star_icon.svg')} className="  w-8 h-8 self-center" alt="SettingIcon" />
                 </View>
             </View>

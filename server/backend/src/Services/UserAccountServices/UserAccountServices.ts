@@ -131,6 +131,102 @@ const GetUserAccountPublicData = async (req: CustomRequest, res: Response) => {
 };
 
 /**
+ * Gets a personal user account data by User Private Token
+ * @param {CustomRequest} req
+ * @param {Response} res
+ * @return {Response}
+ */
+const GetUserAccountSubscriptions = async (req: CustomRequest, res: Response) => {
+    const errors = CustomRequestValidationResult(req);
+    if (!errors.isEmpty()) {
+        errors.array().map((error) => {
+            logging.error('GET_ACCOUNT_DATA', error.errorMsg);
+        });
+
+        return res.status(200).json({ error: true, errors: errors.array() });
+    }
+
+    try {
+        const UserEmail = await UtilFunc.getUserEmailFromPrivateToken(req.pool!, req.params.userPrivateToken);
+
+        if (UserEmail == null) {
+            return res.status(200).json({
+                error: true,
+            });
+        }
+
+        const customers = await req.stripe?.customers.list({ email: UserEmail });
+
+        if (customers == null) {
+            return res.status(200).json({
+                error: true,
+            });
+        }
+
+        // List all subscriptions for the given customer ID
+        const subscriptions = await req.stripe?.subscriptions.list({
+            customer: customers.data[0].id,
+            status: 'active', // Fetch subscriptions of any status
+        });
+
+        if (subscriptions == null) {
+            return res.status(200).json({
+                error: true,
+            });
+        }
+
+        // Extract product IDs from subscription items
+        const productIds: Set<string> = new Set();
+        for (const subscription of subscriptions!.data) {
+            for (const item of subscription.items.data) {
+                if (item.price.product) {
+                    productIds.add(item.price.product as string);
+                }
+            }
+        }
+
+        // Fetch product details for each product ID
+        const products = await Promise.all(Array.from(productIds).map((productId) => req.stripe?.products.retrieve(productId)));
+
+        if (products == null) {
+            return res.status(200).json({
+                error: true,
+            });
+        }
+
+        // Extract PublicToken from products metadata
+        const publicTokens = products.map((product) => product!.metadata.PublicToken).filter((token) => token !== undefined);
+        const connection = await req.pool?.promise().getConnection();
+
+        // Query the database to get user data based on PublicToken
+        const userDataPromises = publicTokens.map(async (token) => {
+            const userData = await query(
+                connection,
+                `SELECT u.AccountType, u.Sport, u.UserName, u.UserPublicToken, r.Rating
+                FROM users u
+                LEFT JOIN ratings r ON u.UserPublicToken = r.UserToken
+                WHERE u.UserPublicToken ="${token}";`,
+            );
+            return userData[0];
+        });
+
+        const userData = await Promise.all(userDataPromises);
+
+        return res.status(200).json({
+            error: false,
+            userData: userData,
+        });
+    } catch (error: any) {
+        logging.error(NAMESPACE, error.message);
+
+        res.status(202).json({
+            error: true,
+            errmsg: error.message,
+        });
+    }
+};
+
+/**
  * Change  users data
  * @param {CustomRequest} req
  * @param {Response} res
@@ -448,6 +544,7 @@ export default {
     GetUserAccountData,
     GetUserAccountPublicData,
     ChangeUserData,
+    GetUserAccountSubscriptions,
     RegisterUser,
     LoginUser,
     UploadPhoto,

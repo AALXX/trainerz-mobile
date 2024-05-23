@@ -17,6 +17,7 @@ const AccountView = (props: { UserPublicToken: string }) => {
         LocationCountry: '',
         LocationCity: '',
         UserEmail: '',
+        PhoneNumber: '',
         AccountType: 'SportsPerson',
         Sport: '',
         UserVisibility: '',
@@ -67,6 +68,7 @@ const AccountView = (props: { UserPublicToken: string }) => {
                     UserName={userData.UserName}
                     UserPublicToken={props.UserPublicToken}
                     UserVisibility={userData.UserVisibility}
+                    PhoneNumber={userData.PhoneNumber}
                     AccountPrice={userData.AccountPrice}
                 />
             ) : (
@@ -80,6 +82,7 @@ const AccountView = (props: { UserPublicToken: string }) => {
                     UserEmail={userData.UserEmail}
                     UserName={userData.UserName}
                     UserPublicToken={props.UserPublicToken}
+                    PhoneNumber={userData.PhoneNumber}
                     UserVisibility={userData.UserVisibility}
                 />
             )}

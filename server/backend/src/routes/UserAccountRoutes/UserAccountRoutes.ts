@@ -39,6 +39,8 @@ router.get('/get-account-data/:accountPrivateToken', param('accountPrivateToken'
 
 router.get('/get-account-public-data/:accountPublicToken', param('accountPublicToken').not().isEmpty(), UserAccountServices.GetUserAccountPublicData);
 
+router.get('/get-account-subscriptions/:userPrivateToken', param('userPrivateToken').not().isEmpty(), UserAccountServices.GetUserAccountSubscriptions);
+
 router.post(
     '/change-user-data',
     body('userName').not().isEmpty(),
