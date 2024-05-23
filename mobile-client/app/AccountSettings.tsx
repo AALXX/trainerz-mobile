@@ -40,6 +40,7 @@ const AccountSettings = () => {
                 userName: userName,
                 userEmail: email,
                 userDescription: description,
+                price: accountPrice,
                 sport: sport,
                 accountType: accountType,
                 userVisibility: Visibility,

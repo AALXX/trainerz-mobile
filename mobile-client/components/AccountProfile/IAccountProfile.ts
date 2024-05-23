@@ -8,6 +8,7 @@ export interface IUserData {
     LocationCity: string
     Sport: string
     UserEmail: string
+    PhoneNumber: string
     UserVisibility: string
     AccountType: string
     UserPublicToken: string

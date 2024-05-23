@@ -62,7 +62,7 @@ const GetUserAccountData = async (req: CustomRequest, res: Response) => {
 
     try {
         const connection = await req.pool?.promise().getConnection();
-        const GetUserDataQueryString = `SELECT UserName, Description, BirthDate, AccountPrice, LocationCountry, LocationCity, Sport, UserEmail, UserVisibility, AccountType, UserPublicToken 
+        const GetUserDataQueryString = `SELECT UserName, Description, BirthDate, AccountPrice, LocationCountry, LocationCity, Sport, UserEmail, PhoneNumber, UserVisibility, AccountType, UserPublicToken 
         FROM users WHERE UserPrivateToken='${req.params.accountPrivateToken}';`;
 
         const data = await query(connection, GetUserDataQueryString);
@@ -153,9 +153,37 @@ const ChangeUserData = async (req: CustomRequest, res: Response) => {
         Description='${req.body.userDescription}',
         UserEmail='${req.body.userEmail}', 
         Sport='${req.body.sport}',
+        AccountPrice='${req.body.price}',
         AccountType='${req.body.accountType}',
         userVisibility='${req.body.userVisibility}' WHERE UserPrivateToken='${req.body.userPrivateToken}';`;
         await query(connection, changeUserDataSQL);
+
+        const UserPublicToken = await UtilFunc.getUserPublicTokenFromPrivateToken(req.pool!, req.body.userPrivateToken);
+
+        const products = await req.stripe?.products.list();
+        // Find the product with the matching name
+        const product = products!.data.find((p) => p.metadata.PublicToken === UserPublicToken);
+        if (product != null) {
+            const prices = await req.stripe?.prices.list({
+                product: product.id,
+                active: true, // Only list active prices (optional)
+            });
+
+            // Create a new price for the same product
+            await req.stripe?.prices.create({
+                product: product.id,
+                unit_amount: req.body.price * 100,
+                currency: 'usd',
+                recurring: {
+                    interval: 'month',
+                },
+            });
+
+            // Mark the old price as inactive using metadata
+            await req.stripe?.prices.update(prices!.data[0].id, {
+                active: false,
+            });
+        }
 
         const searchServerResp = await axios.post(`${process.env.SEARCH_SERVER}/update-indexed-user`, {
             UserName: req.body.userName,
@@ -164,13 +192,13 @@ const ChangeUserData = async (req: CustomRequest, res: Response) => {
             AccountType: req.body.accountType,
         });
 
-        if (searchServerResp.data.error === false) {
-            res.status(202).json({
+        if (searchServerResp.data.error === true) {
+            return res.status(202).json({
                 error: true,
             });
         }
 
-        res.status(202).json({
+        return res.status(202).json({
             error: false,
         });
     } catch (error: any) {
@@ -210,10 +238,10 @@ const RegisterUser = async (req: CustomRequest, res: Response) => {
 
     const userPublicToken = jwt.sign(publicData, `${process.env.ACCOUNT_REGISTER_SECRET}`);
     const InsertUserQueryString = `
-    INSERT INTO users (UserName, Description, BirthDate, LocationCountry, LocationCity, Sport, UserEmail, UserPwd, UserVisibility, AccountType, AccountPrice, UserPrivateToken, UserPublicToken)
+    INSERT INTO users (UserName, Description, BirthDate, LocationCountry, LocationCity, Sport, PhoneNumber, UserEmail, UserPwd, UserVisibility, AccountType, AccountPrice, UserPrivateToken, UserPublicToken)
     VALUES('${req.body.userName}', '${req.body.description}', 
     '${req.body.userBirthDate}', '${req.body.locationCountry}', 
-    '${req.body.locationCity}', '${req.body.sport}', '${req.body.userEmail}', '${hashedpwd}', 'public', '${req.body.accountType}',
+    '${req.body.locationCity}', '${req.body.sport}', '${req.body.phoneNumber}', '${req.body.userEmail}', '${hashedpwd}', 'public', '${req.body.accountType}',
     '${req.body.accountPrice}',  '${userPrivateToken}', '${userPublicToken}');`;
 
     try {
@@ -254,7 +282,7 @@ const RegisterUser = async (req: CustomRequest, res: Response) => {
                 console.log('error');
             }
 
-            res.status(202).json({
+            return res.status(202).json({
                 error: false,
                 userprivateToken: userPrivateToken,
                 userpublictoken: userPublicToken,

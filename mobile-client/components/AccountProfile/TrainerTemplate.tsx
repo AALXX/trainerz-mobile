@@ -94,10 +94,15 @@ const TrainerTemplate = (props: IUserData) => {
                         </View>
                     </View>
                 )
-            case 'Message':
+            case 'Contact':
                 return (
                     <View className="flex h-full w-full">
-                        <Text>Message</Text>
+                        <View className="bg-[#2323237c] rounded-xl mt-6 w-[90%] h-44 self-center">
+                            <Text className="text-white self-center mt-4 text-lg ">You can contact me here</Text>
+                            <View className="bg-[#6F5596] w-full h-[0.2vh] mt-3" />
+                            <Text className="text-white self-center mt-4">Email: {props.UserEmail}</Text>
+                            <Text className="text-white self-center mt-4">Phone: {props.PhoneNumber}</Text>
+                        </View>
                     </View>
                 )
             default:
@@ -198,7 +203,7 @@ const TrainerTemplate = (props: IUserData) => {
                 <View className="flex flex-row justify-around">
                     <ProfileCards TabName="Courses" Title="Courses" setComponentToShow={setComponentToShow} />
                     <ProfileCards TabName="About" Title="About" setComponentToShow={setComponentToShow} />
-                    <ProfileCards TabName="Message" Title="Message" setComponentToShow={setComponentToShow} />
+                    <ProfileCards TabName="Contact" Title="Contact" setComponentToShow={setComponentToShow} />
                 </View>
                 <View className="bg-[#6F5596] w-full h-1 " />
             </View>

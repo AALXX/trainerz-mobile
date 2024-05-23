@@ -18,6 +18,7 @@ const AccountProfile = () => {
         LocationCountry: '',
         LocationCity: '',
         UserEmail: '',
+        PhoneNumber: '',
         AccountType: 'SportsPerson',
         Sport: '',
         UserVisibility: '',
@@ -65,6 +66,7 @@ const AccountProfile = () => {
                     LocationCity={userData.LocationCity}
                     LocationCountry={userData.LocationCountry}
                     Sport={userData.Sport}
+                    PhoneNumber={userData.PhoneNumber}
                     UserEmail={userData.UserEmail}
                     UserName={userData.UserName}
                     UserPublicToken={userData.UserPublicToken}
@@ -76,6 +78,7 @@ const AccountProfile = () => {
                     AccountType={userData.AccountType}
                     BirthDate={userData.BirthDate}
                     Description={userData.Description}
+                    PhoneNumber={userData.PhoneNumber}
                     LocationCity={userData.LocationCity}
                     LocationCountry={userData.LocationCountry}
                     Sport={userData.Sport}

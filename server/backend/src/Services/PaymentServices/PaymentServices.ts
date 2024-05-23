@@ -102,7 +102,7 @@ const CheckSubscription = async (req: CustomRequest, res: Response) => {
                 // Check if any subscription includes the specified product
                 const isSubscribed = subscriptions!.data.some((subscription) => subscription.items.data.some((item) => item.price.product === product!.id));
 
-                res.json({ isSubscribed });
+                return res.json({ isSubscribed });
             }
             res.json({ isSubscribed: false });
         }

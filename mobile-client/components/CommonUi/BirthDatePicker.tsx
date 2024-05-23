@@ -1,6 +1,7 @@
 import React, { Dispatch, SetStateAction, useState } from 'react'
-import { View, Button, Platform } from 'react-native'
+import { View, Button, Platform, Text } from 'react-native'
 import DateTimePicker from '@react-native-community/datetimepicker'
+import { TouchableOpacity } from 'react-native-gesture-handler'
 
 interface IDatePickerProps {
     value: Date
@@ -16,9 +17,16 @@ export const DatePickerComponent: React.FC<IDatePickerProps> = props => {
     }
 
     return (
-        <View className="flex items-start mt-2  ">
-            <Button onPress={() =>{setShowPicker(true)}} title="Show Date Picker" />
-            {showPicker && <DateTimePicker value={props.value} mode="date" display="spinner" onChange={onChange}  />}
+        <View className="flex mt-2 ">
+            <TouchableOpacity
+                onPress={() => {
+                    setShowPicker(true)
+                }}
+                className="bg-[#3b366c] w-full h-8 rounded-md"
+            >
+                <Text className="text-white m-auto">BirthDate</Text>
+            </TouchableOpacity>
+            {showPicker && <DateTimePicker value={props.value} mode="date" display="spinner" onChange={onChange} />}
         </View>
     )
 }

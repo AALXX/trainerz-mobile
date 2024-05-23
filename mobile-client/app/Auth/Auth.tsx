@@ -18,6 +18,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 const accRegisterFunc = async (
     userName: string,
     userEmail: string,
+    phoneNumber: string,
     password: string,
     repeatedPassword: string,
     description: string,
@@ -36,6 +37,7 @@ const accRegisterFunc = async (
     const res = await axios.post(`${process.env.EXPO_PUBLIC_SERVER_BACKEND}/user-account-manager/register-account`, {
         userName,
         userEmail,
+        phoneNumber,
         password,
         sport,
         accountPrice,
