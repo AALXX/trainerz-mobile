@@ -15,7 +15,7 @@ const AthelteTemplate = (props: IUserData) => {
     const [refreshing, setRefreshing] = useState(false)
 
     const GetPhotos = async () => {
-        if(props.UserPublicToken === '') return
+        if (props.UserPublicToken === '') return
         const resp = await axios.get(`${process.env.EXPO_PUBLIC_SERVER_BACKEND}/user-account-manager/get-account-photos/${props.UserPublicToken}`)
         if (resp.data.photosData !== null) setPhotos(resp.data.photosData)
     }
@@ -54,8 +54,20 @@ const AthelteTemplate = (props: IUserData) => {
                     </TouchableOpacity>
                 </View>
             ) : null}
-
-            <Image source={`${process.env.EXPO_PUBLIC_FILE_SERVER}/${userPublicToken}/Main_Icon.png`} placeholder="acountImage" className="self-center mt-4 " style={{ width: 120, height: 120, borderRadius: 50 }} />
+            
+            {props.UserPublicToken == userPublicToken ? (
+                <TouchableOpacity onPress={() => router.push('/ChangeUserIcon')}>
+                    <Image source={`${process.env.EXPO_PUBLIC_FILE_SERVER}/${userPublicToken}/Main_Icon.png`} cachePolicy={'none'} placeholder="acountImage" className="self-center mt-4 w-32 h-32 rounded-full " />
+                </TouchableOpacity>
+            ) : (
+                <Image
+                    source={`${process.env.EXPO_PUBLIC_FILE_SERVER}/${userPublicToken}/Main_Icon.png`}
+                    placeholder="acountImage"
+                    className="self-center mt-4 "
+                    style={{ width: 120, height: 120, borderRadius: 50 }}
+                    cachePolicy={'none'}
+                />
+            )}
             <View className="flex flex-col">
                 <View className="flex flex-row justify-center ">
                     <Text className="self-center  text-xl text-white mt-2 ">{props.UserName}</Text>

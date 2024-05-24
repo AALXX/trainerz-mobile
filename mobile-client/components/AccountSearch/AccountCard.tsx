@@ -21,6 +21,7 @@ const AccountCard = (props: IAccountCard) => {
             <View className="bg-[#00000060] rounded-2xl h-20 w-[95%] mt-8 flex-row self-center">
                 <Image
                     source={`${process.env.EXPO_PUBLIC_FILE_SERVER}/${props.UserPublicToken}/Main_Icon.png`}
+                    cachePolicy={'none'}
                     placeholder="acountImage"
                     className="self-center ml-2"
                     style={{ width: 60, height: 60, borderRadius: 25 }}

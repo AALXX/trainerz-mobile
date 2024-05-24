@@ -112,8 +112,9 @@ const VideoPlayer = (props: { VideoToken: string }) => {
                         onError={error => alert(`Video Error: ${error}`)}
                     />
                 </TouchableOpacity>
+
                 <View className="flex flex-row w-full h-[12vh] bg-[#0000008b]">
-                    <Image source={`${process.env.EXPO_PUBLIC_FILE_SERVER}/${VideoData.OwnerToken}/Main_Icon.png`} placeholder="acountImage" className="w-12 h-12 rounded-full self-center ml-2" />
+                    <Image source={`${process.env.EXPO_PUBLIC_FILE_SERVER}/${VideoData.OwnerToken}/Main_Icon.png`} placeholder="acountImage" className="w-12 h-12 rounded-full self-center ml-2" cachePolicy={'none'} />
                     <View className="flex flex-col ml-2 h-full self-center   w-[80%] justify-center">
                         <Text className="text-white text-lg">{VideoData.VideoTitle}</Text>
                         <View className=" h-[0.1vh] bg-white full  mt-1" />

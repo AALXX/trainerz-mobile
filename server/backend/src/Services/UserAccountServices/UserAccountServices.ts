@@ -62,8 +62,28 @@ const GetUserAccountData = async (req: CustomRequest, res: Response) => {
 
     try {
         const connection = await req.pool?.promise().getConnection();
-        const GetUserDataQueryString = `SELECT UserName, Description, BirthDate, AccountPrice, LocationCountry, LocationCity, Sport, UserEmail, PhoneNumber, UserVisibility, AccountType, UserPublicToken 
-        FROM users WHERE UserPrivateToken='${req.params.accountPrivateToken}';`;
+        const GetUserDataQueryString = `SELECT 
+            u.UserName, 
+            u.Description, 
+            u.BirthDate, 
+            u.AccountPrice, 
+            u.LocationCountry, 
+            u.LocationCity, 
+            u.Sport, 
+            u.UserEmail, 
+            u.PhoneNumber, 
+            u.UserVisibility, 
+            u.AccountType, 
+            u.UserPublicToken, 
+            r.Rating
+        FROM 
+            users u
+        INNER JOIN 
+            ratings r
+        ON 
+            u.UserPublicToken = r.UserToken
+        WHERE 
+            u.UserPrivateToken = '${req.params.accountPrivateToken}';`;
 
         const data = await query(connection, GetUserDataQueryString);
         if (Object.keys(data).length === 0) {
@@ -504,6 +524,41 @@ const UploadPhoto = async (req: CustomRequest, res: Response) => {
     });
 };
 
+const ChangeUserIcon = async (req: CustomRequest, res: Response) => {
+    PhotoUploader(req, res, async (err: any) => {
+        if (err) {
+            return res.status(200).json({
+                msg: 'falied to upload',
+                error: true,
+            });
+        }
+
+        // console.log(req.file);
+
+        const userPublicToken = await UtilFunc.getUserPublicTokenFromPrivateToken(req.pool!, req.body.UserPrivateToken);
+        if (userPublicToken == null) {
+            return res.status(200).json({
+                error: true,
+            });
+        }
+
+        //* Directory Created Succesfully
+        fs.rename(`${process.env.ACCOUNTS_FOLDER_PATH}/PhotosTmp/${req.file?.originalname}`, `${process.env.ACCOUNTS_FOLDER_PATH}/${userPublicToken}/Main_Icon.png`, async (err) => {
+            if (err) {
+                logging.error(NAMESPACE, err.message);
+
+                return res.status(200).json({
+                    error: true,
+                });
+            }
+
+            return res.status(200).json({
+                error: false,
+            });
+        });
+    });
+};
+
 const GetAccountPhotos = async (req: CustomRequest, res: Response) => {
     const errors = CustomRequestValidationResult(req);
     if (!errors.isEmpty()) {
@@ -544,6 +599,7 @@ export default {
     GetUserAccountData,
     GetUserAccountPublicData,
     ChangeUserData,
+    ChangeUserIcon,
     GetUserAccountSubscriptions,
     RegisterUser,
     LoginUser,

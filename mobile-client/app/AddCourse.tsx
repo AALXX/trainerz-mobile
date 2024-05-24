@@ -116,7 +116,7 @@ const AddCourse = () => {
                 </View>
 
                 <View className="flex w-[95%] self-center  mt-2 h-24">
-                    <View className="flex flex-row w-full ">
+                    {/* <View className="flex flex-row w-full ">
                         <Text className="text-white self-center text-lg">Custom Price</Text>
                         <Switch
                             className="self-center "
@@ -126,7 +126,7 @@ const AddCourse = () => {
                             onValueChange={() => setCustomPrice(!customPrice)}
                             value={customPrice}
                         />
-                    </View>
+                    </View> */}
                     {customPrice ? (
                         <View>
                             <Text className="text-sm text-white mt-2">Price: ${price.toFixed(2)}</Text>

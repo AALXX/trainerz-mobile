@@ -12,6 +12,7 @@ export interface IUserData {
     UserVisibility: string
     AccountType: string
     UserPublicToken: string
+    Rating?: number
     AccountPrice?: number
 }
 

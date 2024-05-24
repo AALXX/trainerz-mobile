@@ -33,6 +33,20 @@ const AccountSettings = () => {
         setAccountPrice(+params.AccountPrice as number) //+ is here to convert to a positive number because typescript
     }, [])
 
+    const WithdrowTheMoney = async () => {
+        const userToken = await AsyncStorage.getItem('userToken')
+        if (userToken) {
+            const res = await axios.post(`${process.env.EXPO_PUBLIC_SERVER_BACKEND}/payment-manager/withdraw`, {
+                UserPrivateToken: userToken
+            })
+            if (res.data.error) {
+                alert('error encoutered!')
+            } else {
+                alert('We sent you an email with the necessary  steps!')
+            }
+        }
+    }
+
     const changeUserData = async () => {
         const userToken = await AsyncStorage.getItem('userToken')
         axios
@@ -136,21 +150,23 @@ const AccountSettings = () => {
                     <Text className="w-full text-white text-center m-auto ">Update</Text>
                 </TouchableOpacity>
             </View>
-
+            {accountType === 'Trainer' ? (
+                <>
+                    <View className="self-center h-[0.1vh] w-[90%] bg-white mt-4" />
+                    <View className="flex flex-col w-[90%]  self-center">
+                        <TouchableOpacity
+                            className="flex flex-row bg-[#3c376f] self-center  border-none text-white mt-4 h-8 w-full rounded-xl  hover:bg-[#525252] active:bg-[#2b2b2b]"
+                            onPress={() => {
+                                WithdrowTheMoney()
+                            }}
+                        >
+                            <Text className="w-full text-white h-8 text-center mt-2 hover:bg-[#3b366c] active:bg-[#2b2b2b] roxl">Withdrow The Money</Text>
+                        </TouchableOpacity>
+                    </View>
+                </>
+            ) : null}
             <View className="self-center h-[0.1vh] w-[90%] bg-white mt-4" />
-            <View className="flex flex-col w-[90%]  self-center">
-                <TouchableOpacity
-                    className="flex flex-row bg-[#3c376f] self-center  border-none text-white mt-4 h-8 w-full rounded-xl  hover:bg-[#525252] active:bg-[#2b2b2b]"
-                    onPress={() => {
-                        alert('delete')
-                        // changePassword()
-                    }}
-                >
-                    <Text className="w-full text-white h-8 text-center mt-2 hover:bg-[#3b366c] active:bg-[#2b2b2b] roxl">Change Password</Text>
-                </TouchableOpacity>
-            </View>
 
-            <View className="self-center h-[0.1vh] w-[90%] bg-white mt-4" />
             <View className="flex flex-col w-[90%]  self-center">
                 <TouchableOpacity
                     className="flex flex-row bg-[#3b366c] self-center rounded-xl border-none text-white mt-4 h-8 w-full  hover:bg-[#525252] active:bg-[#2b2b2b]"

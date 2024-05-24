@@ -34,10 +34,10 @@ const VideoCardTemplate = (props: IVideoTemplateProps) => {
                 }}
             >
                 <View className="flex flex-col bg-white w-full h-full rounded-2xl ">
-                    <Image source={`${process.env.EXPO_PUBLIC_FILE_SERVER}/${props.OwnerToken}/${props.VideoToken}/Thumbnail_image.jpg`} className="absolute self-center w-full h-full" />
+                    <Image source={`${process.env.EXPO_PUBLIC_FILE_SERVER}/${props.OwnerToken}/${props.VideoToken}/Thumbnail_image.jpg`} className="absolute self-center w-full h-full" cachePolicy={'none'} />
                     <View className="flex flex-col h-full ">
                         <View className="flex flex-row mt-auto bg-[#00000088] h-[30%] rounded-b-2xl">
-                            <Image source={`${process.env.EXPO_PUBLIC_FILE_SERVER}/${props.OwnerToken}/Main_Icon.png`} className=" rounded-full self-center w-12 h-12 ml-2" />
+                            <Image source={`${process.env.EXPO_PUBLIC_FILE_SERVER}/${props.OwnerToken}/Main_Icon.png`} className=" rounded-full self-center w-12 h-12 ml-2" cachePolicy={'none'} />
 
                             <View className="flex flex-col self-center w-[40%]">
                                 <TruncatedText text={props.VideoTitle} characters={26} className="text-white text-lg ml-3" />

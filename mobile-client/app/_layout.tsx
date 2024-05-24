@@ -66,16 +66,9 @@ function RootLayoutNav() {
                             }
                         }}
                     />
-                    <Stack.Screen
-                        name="WatchVideo"
-                        options={{
-                            title: '',
-                            presentation: 'card',
-                            headerStyle: {
-                                backgroundColor: '#3b366c'
-                            }
-                        }}
-                    />
+
+                    
+                    <Stack.Screen name="ChangeUserIcon" />
                     <Stack.Screen
                         name="EditVideoCourse"
                         options={{

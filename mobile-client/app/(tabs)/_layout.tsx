@@ -1,25 +1,19 @@
-import FontAwesome from '@expo/vector-icons/FontAwesome'
 import { Tabs } from 'expo-router'
-import { View, useColorScheme } from 'react-native'
+import { View } from 'react-native'
 import { Image } from 'expo-image'
 
-/**
- * You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
- */
-function TabBarIcon(props: { name: React.ComponentProps<typeof FontAwesome>['name']; color: string }) {
-    return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />
-}
-
 export default function TabLayout() {
-    const colorScheme = useColorScheme()
 
     return (
         <Tabs>
             <Tabs.Screen
                 name="index"
                 options={{
+                    title: '',
+
                     headerShown: false,
-                    tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+                    tabBarIcon: () => <Image source={require('../../assets/Subscriptions_icon.svg')} className="w-8 h-8 mt-4" alt="SettingIcon" />,
+
                     tabBarStyle: {
                         backgroundColor: '#5f56b2'
                     }
@@ -46,11 +40,12 @@ export default function TabLayout() {
                     tabBarStyle: {
                         backgroundColor: '#5f56b2'
                     },
-                    tabBarIcon: ({ color }) => (
+                    tabBarIcon: () => (
                         <Image
-                            source={`${process.env.EXPO_PUBLIC_FILE_SERVER}/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2NzQ2NzkxMjZ9.8wWitGJAELNTcTFwcsDejqp2lV0AtD5oVo2s3CxGXE4/Main_Icon.png`}
+                            source={`${process.env.EXPO_PUBLIC_FILE_SERVER}/null/Main_Icon.png`}
                             placeholder="acountImage"
                             className=" mt-3"
+                            cachePolicy={'none'}
                             style={{ width: 40, height: 40, borderRadius: 25 }}
                         />
                     ),

@@ -22,6 +22,7 @@ const AccountView = (props: { UserPublicToken: string }) => {
         Sport: '',
         UserVisibility: '',
         UserPublicToken: '',
+        Rating:0,
         AccountPrice: 0
     })
 
@@ -70,6 +71,7 @@ const AccountView = (props: { UserPublicToken: string }) => {
                     UserVisibility={userData.UserVisibility}
                     PhoneNumber={userData.PhoneNumber}
                     AccountPrice={userData.AccountPrice}
+                    Rating={userData.Rating}
                 />
             ) : (
                 <AthelteTemplate

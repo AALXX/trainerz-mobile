@@ -23,7 +23,8 @@ const AccountProfile = () => {
         Sport: '',
         UserVisibility: '',
         UserPublicToken: '',
-        AccountPrice: 0
+        AccountPrice: 0,
+        Rating: 0
     })
 
     const getProfileData = async (userToken: string | null) => {
@@ -72,6 +73,7 @@ const AccountProfile = () => {
                     UserPublicToken={userData.UserPublicToken}
                     UserVisibility={userData.UserVisibility}
                     AccountPrice={userData.AccountPrice}
+                    Rating={userData.Rating}
                 />
             ) : (
                 <AthelteTemplate

@@ -6,10 +6,9 @@ import PaymentServices from '../../Services/PaymentServices/PaymentServices';
 const router = express.Router();
 
 router.post(
-    '/create-customer',
-
-    body('email').not().isEmpty(),
-    PaymentServices.CreateCustomer,
+    '/withdraw',
+    body('UserPrivateToken').not().isEmpty(),
+    PaymentServices.WithdrowMoney,
 );
 
 router.post('/create-subscription', body('paymentMethodId').not().isEmpty(), body('UserPrivateToken').not().isEmpty(), body('AccountPublicToken').not().isEmpty(), PaymentServices.CreateSubscription);

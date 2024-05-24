@@ -75,8 +75,14 @@ const TrainerTemplate = (props: IUserData) => {
             case 'About':
                 return (
                     <View className="flex h-full w-full">
-                        <View className="bg-[#2323237c] rounded-xl mt-6 w-[90%] h-44 self-center">
+                        <View className="bg-[#2323237c] rounded-xl mt-6 w-[90%] h-60 self-center">
                             <Text className="text-white self-center mt-4 text-lg ">About: {props.UserName}</Text>
+                            <View className="bg-[#6F5596] w-full h-[0.2vh] mt-3" />
+                            <View className="flex flex-row items-center mt-3">
+                                <Text className="text-white text-lg ml-4 ">Account Rating</Text>
+                                {props.Rating == null ? <Text className="text-white text-lg ml-auto mr-2 self-center">0/5</Text> : <Text className="text-white text-lg ml-auto mr-2 self-center">{props.Rating}/5</Text>}
+                                <Image source={require('../../assets/star_icon.svg')} className="mr-4 w-8 h-8 self-center" alt="SettingIcon" />
+                            </View>
                             <View className="bg-[#6F5596] w-full h-[0.2vh] mt-3" />
                             <TextInput
                                 className="rounded-xl mt-2 text-white w-[90%] self-center"
@@ -137,7 +143,19 @@ const TrainerTemplate = (props: IUserData) => {
                     </TouchableOpacity>
                 </View>
             ) : null}
-            <Image source={`${process.env.EXPO_PUBLIC_FILE_SERVER}/${userPublicToken}/Main_Icon.png`} placeholder="acountImage" className="self-center mt-4 " style={{ width: 120, height: 120, borderRadius: 50 }} />
+            {props.UserPublicToken == userPublicToken ? (
+                <TouchableOpacity onPress={() => router.push('/ChangeUserIcon')}>
+                    <Image source={`${process.env.EXPO_PUBLIC_FILE_SERVER}/${props.UserPublicToken}/Main_Icon.png`} cachePolicy={'none'} placeholder="acountImage" className="self-center mt-4 w-32 h-32 rounded-full" />
+                </TouchableOpacity>
+            ) : (
+                <Image
+                    source={`${process.env.EXPO_PUBLIC_FILE_SERVER}/${props.UserPublicToken}/Main_Icon.png`}
+                    placeholder="acountImage"
+                    className="self-center mt-4 "
+                    style={{ width: 120, height: 120, borderRadius: 50 }}
+                    cachePolicy={'none'}
+                />
+            )}
             <View className="flex flex-col">
                 <View className="flex flex-row justify-center ">
                     <Text className="self-center  text-xl text-white mt-2 ">{props.UserName}</Text>

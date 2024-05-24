@@ -184,7 +184,7 @@ const LoginRegisterModal = () => {
                                 <View className="flex w-[85%] self-center mt-3  h-16">
                                     <Text className="text-sm text-white ">Account Pricing: ${accountPrice.toFixed(2)}</Text>
 
-                                    <Slider minimumTrackTintColor={'#6e64c6'} thumbTintColor="#2f2b57" minimumValue={0} maximumValue={100} step={1} value={accountPrice} onValueChange={setAccountPrice} />
+                                    <Slider minimumTrackTintColor={'#6e64c6'} thumbTintColor="#2f2b57" minimumValue={5} maximumValue={100} step={1}  value={accountPrice} onValueChange={setAccountPrice} />
                                 </View>
                                 <View className="mt-auto ">
                                     <TouchableOpacity className="self-center w-[85%] h-[6vh]  bg-[#3b366c] justify-center rounded-xl " onPress={() => setComponentToShow('secondTab')}>
@@ -307,7 +307,7 @@ const LoginRegisterModal = () => {
                                     onChangeText={text => setLoginEmail(text)}
                                 />
                             </View>
-                            <View className="flex w-[85%] self-center  h-24">
+                            <View className="flex w-[85%] self-center mt-4 h-24">
                                 <Text className="text-sm text-white">Password</Text>
                                 <TextInput
                                     className="text-white bg-[#474084] h-[6vh] mt-[5%] indent-3 rounded-xl"

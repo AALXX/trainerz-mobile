@@ -55,12 +55,12 @@ router.post(
 );
 
 router.post('/upload-user-image', UserAccountServices.UploadPhoto);
+router.post('/change-user-icon', UserAccountServices.ChangeUserIcon);
 
 router.get('/get-account-photos/:accountPublicToken', param('accountPublicToken').not().isEmpty(), UserAccountServices.GetAccountPhotos);
 
 
 // router.post('/delete-user-account', body('userToken').not().isEmpty(), UserAccountServices.DeleteUserAccount);
 
-// router.post('/change-user-icon', UserAccountServices.ChangeUserIcon);
 
 export = router;

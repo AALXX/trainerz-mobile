@@ -3,6 +3,8 @@ import { validationResult } from 'express-validator';
 import { CustomRequest } from '../../config/mysql';
 import logging from '../../config/logging';
 import utilFunctions from '../../util/utilFunctions';
+import nodemailer from 'nodemailer';
+
 /**
  * Validates and cleans the CustomRequest form
  */
@@ -14,23 +16,51 @@ const CustomRequestValidationResult = validationResult.withDefaults({
     },
 });
 
-const CreateCustomer = async (req: CustomRequest, res: Response) => {
+const WithdrowMoney = async (req: CustomRequest, res: Response) => {
     const errors = CustomRequestValidationResult(req);
     if (!errors.isEmpty()) {
         errors.array().map((error) => {
-            logging.error('CREATE_CUSTOMER', error.errorMsg);
+            logging.error('WithdrowMoney', error.errorMsg);
         });
 
         return res.status(200).json({ error: true, errors: errors.array() });
     }
 
     try {
-        const customer = await req.stripe?.customers.create({
-            email: req.body.email,
+        const UserEmail = await utilFunctions.getUserEmailFromPrivateToken(req.pool!, req.body.UserPrivateToken);
+
+        if (UserEmail == null) {
+            res.status(200).send({ error: true });
+        }
+
+        // Create a transporter with Gmail SMTP configuration
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.platform_gmail,
+                pass: process.env.platform_gmail_password,
+            },
         });
-        res.send({ customer });
+
+        const mailOptions = {
+            from: process.env.platform_gmail,
+            to: UserEmail!,
+            subject: 'Email Change Link',
+            text: `We're sorry to inform you but we haven't implemented this feature yet. Contact us for money withdrawal.`,
+        };
+
+        // Send the email
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.error(error);
+                res.status(500).send('Error sending email');
+            } else {
+                console.log('Email sent: ' + info.response);
+                res.status(200).send('Email sent successfully');
+            }
+        });
     } catch (error: any) {
-        res.status(400).send({ error: error.message });
+        res.status(400).send({ error: true });
     }
 };
 
@@ -38,7 +68,7 @@ const CreateSubscription = async (req: CustomRequest, res: Response) => {
     const errors = CustomRequestValidationResult(req);
     if (!errors.isEmpty()) {
         errors.array().map((error) => {
-            logging.error('CREATE_CUSTOMER', error.errorMsg);
+            logging.error('CREATE_SUBSCRIPTION', error.errorMsg);
         });
 
         return res.status(200).json({ error: true, errors: errors.array() });
@@ -75,7 +105,7 @@ const CreateSubscription = async (req: CustomRequest, res: Response) => {
         }
         return res.status(200).send({ error: true });
     } catch (error: any) {
-        res.status(400).send({ error: error.message });
+        res.status(400).send({ error: true });
     }
 };
 
@@ -106,7 +136,7 @@ const CheckSubscription = async (req: CustomRequest, res: Response) => {
             res.json({ isSubscribed: false });
         }
     } catch (error: any) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: true });
     }
 };
 
@@ -132,8 +162,8 @@ const CancelSubscription = async (req: CustomRequest, res: Response) => {
             return res.json({ error: true });
         }
     } catch (error: any) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: true });
     }
 };
 
-export default { CreateCustomer, CreateSubscription, CheckSubscription, CancelSubscription };
+export default { WithdrowMoney, CreateSubscription, CheckSubscription, CancelSubscription };
