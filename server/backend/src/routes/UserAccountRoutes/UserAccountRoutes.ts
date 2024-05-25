@@ -51,7 +51,7 @@ router.post('/change-user-icon', UserAccountServices.ChangeUserIcon);
 router.get('/get-account-photos/:accountPublicToken', param('accountPublicToken').not().isEmpty(), UserAccountServices.GetAccountPhotos);
 
 
-// router.post('/delete-user-account', body('userToken').not().isEmpty(), UserAccountServices.DeleteUserAccount);
+router.post('/delete-user-account', body('userToken').not().isEmpty(), UserAccountServices.DeleteUserAccount);
 
 
 export = router;

@@ -137,13 +137,13 @@ const isSubscribed = async (AccountPublicToken: string): Promise<boolean> => {
  */
 const deleteAccount = async (sure: boolean, UserPrivateToken: string) => {
     if (!sure) {
-        window.alert('CheckBox Not Checked')
+        alert('CheckBox Not Checked')
         return false
     }
 
-    const res = await axios.post(`${process.env.EXPO_PUBLIC_SERVER_BACKEND}/user-account/delete-user-account/`, { userToken: UserPrivateToken })
+    const res = await axios.post(`${process.env.EXPO_PUBLIC_SERVER_BACKEND}/user-account-manager/delete-user-account/`, { userToken: UserPrivateToken })
     if (res.data.error) {
-        window.alert('error')
+        alert('error')
         return false
     }
 

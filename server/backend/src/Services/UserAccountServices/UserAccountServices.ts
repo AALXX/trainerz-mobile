@@ -647,6 +647,68 @@ const GetAccountPhotos = async (req: CustomRequest, res: Response) => {
     }
 };
 
+/**
+ * Deletes The user Account and all the videos with it
+ */
+const DeleteUserAccount = async (req: CustomRequest, res: Response) => {
+    const errors = CustomRequestValidationResult(req);
+    if (!errors.isEmpty()) {
+        errors.array().map((error) => {
+            logging.error('LOGiN_USER_FUNC', error.errorMsg);
+        });
+
+        return res.status(200).json({ error: true, errors: errors.array() });
+    }
+
+    try {
+        const connection = await req.pool?.promise().getConnection();
+        const UserPublicToken = await UtilFunc.getUserPublicTokenFromPrivateToken(req.pool!, req.body.userToken);
+        if (UserPublicToken == null) {
+            return res.status(200).json({
+                error: true,
+            });
+        }
+
+        const DeleteUserAccount = `
+        DELETE FROM users WHERE UserPrivateToken='${req.body.userToken}';
+        DELETE FROM videos WHERE OwnerToken='${UserPublicToken}';
+        DELETE FROM comments WHERE ownerToken='${UserPublicToken}';`;
+
+        await query(connection, DeleteUserAccount);
+        fs.stat(`${process.env.ACCOUNTS_FOLDER_PATH}/${UserPublicToken}/`, async (err, stats) => {
+            if (err) {
+                if (err.code === 'ENOENT') {
+                    console.log(`File does not exist: ${req.body.VideoToken}`);
+                    return res.status(202).json({
+                        error: true,
+                    });
+                } else {
+                    console.error(`Error checking file: ${err}`);
+                    return res.status(202).json({
+                        error: true,
+                    });
+                }
+            } else {
+                UtilFunc.RemoveDirectory(`${process.env.ACCOUNTS_FOLDER_PATH}/${UserPublicToken}/`)
+                    .then(() => {
+                        console.log(`Deleted folder: ${UserPublicToken}`);
+                    })
+                    .catch(console.error);
+                return res.status(202).json({
+                    error: false,
+                });
+            }
+        });
+    } catch (error: any) {
+        logging.error(NAMESPACE, error.message);
+
+        res.status(202).json({
+            error: true,
+            errmsg: error.message,
+        });
+    }
+};
+
 export default {
     GetUserAccountData,
     GetUserAccountPublicData,
@@ -657,4 +719,5 @@ export default {
     LoginUser,
     UploadPhoto,
     GetAccountPhotos,
+    DeleteUserAccount,
 };
