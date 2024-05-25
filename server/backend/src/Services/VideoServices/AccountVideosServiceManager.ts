@@ -6,7 +6,7 @@ import logging from '../../config/logging';
 import { CustomRequest, query } from '../../config/mysql';
 
 import utilFunctions from '../../util/utilFunctions';
-import { validationResult } from 'express-validator';
+import { validationResult, body } from 'express-validator';
 import fs from 'fs';
 import FFmpeg from 'fluent-ffmpeg';
 
@@ -71,7 +71,6 @@ const videoUpload = multer({
 
 const UploadVideoFileToServer = async (req: any, res: Response) => {
     logging.info(NAMESPACE, 'Posting Video service called');
-
     videoUpload(req, res, async (err: any) => {
         if (req.body.VideoTitle === '') {
             return res.status(200).json({
@@ -115,7 +114,13 @@ const UploadVideoFileToServer = async (req: any, res: Response) => {
                     });
                 }
 
-                await VideoProceesor(`${process.env.ACCOUNTS_FOLDER_PATH}/${userPublicToken}/${VideoToken}/Original.mp4`, `${process.env.ACCOUNTS_FOLDER_PATH}/${userPublicToken}/${VideoToken}/Source.mp4`, 16);
+                await VideoProceesor(
+                    `${process.env.ACCOUNTS_FOLDER_PATH}/${userPublicToken}/${VideoToken}/Original.mp4`,
+                    `${process.env.ACCOUNTS_FOLDER_PATH}/${userPublicToken}/${VideoToken}/Source.mp4`,
+                    req.body.width,
+                    req.body.height,
+                    16,
+                );
 
                 // *Save video data to db
                 const success = await SendVideoDataToDb(req, userPublicToken as string, VideoToken, req.body.VideoTitle, req.body.Price);
@@ -125,34 +130,10 @@ const UploadVideoFileToServer = async (req: any, res: Response) => {
                     });
                 }
 
-                // await ThumbnailProceesor(`${process.env.ACCOUNTS_FOLDER_PATH}/${userPublicToken}/${VideoToken}/Thumbnail_image.jpg`);
-                // const file = fs.readFileSync(`${process.env.ACCOUNTS_FOLDER_PATH}/${userPublicToken}/${VideoToken}/Original.mp4`);
-
-                // Encode the binary data as Base64
-                // const base64Video = Buffer.from(file).toString('base64');
-
-                const formData = new FormData();
-                // formData.append('file', file, {
-                //     filename: 'Original.mp4',
-                //     contentType: 'video/mp4', // Adjust the content type based on your file type
-                // });
-                // formData.append('file', file);
-                formData.append('video_name', `${req.body.VideoTitle}.mp4`);
+                await ThumbnailProcessor(`${process.env.ACCOUNTS_FOLDER_PATH}/${userPublicToken}/${VideoToken}/Source.mp4`, `${process.env.ACCOUNTS_FOLDER_PATH}/${userPublicToken}/${VideoToken}/`);
 
                 try {
-                    // const video_category_server_resp = await axios.post(`${process.env.VIDEO_CATEGORIZE_SERVER}/get-video-category`, formData, {
-                    //     headers: {
-                    //         'Content-Type': 'multipart/form-data',
-                    //     },
-                    // });
-
-                    // if (video_category_server_resp.data.error == true) {
-                    //     return res.status(200).json({
-                    //         error: true,
-                    //     });
-                    // }
-
-                    if ((await SendVideoCategoryToDb(req, VideoToken, req.body.VideoSport)) == false) {
+                    if ((await SendVideoCategoryToDb(req, VideoToken, req.body.VideoSport[0])) == false) {
                         return res.status(200).json({
                             error: true,
                         });
@@ -227,14 +208,14 @@ const SendVideoDataToDb = async (req: CustomRequest, userPublicToken: string, vi
 };
 
 /**
- * Processes and make all thumbnails 626x325
- * @param {string} path
+ * Extracts a frame from the video and saves it as Thumbnail_image.png
+ * @param {string} videoPath - Path to the video file
+ * @param {string} outputPath - Path to save the thumbnail image
  */
-const ThumbnailProceesor = async (path: string) =>
+const ThumbnailProcessor = async (videoPath: string, outputPath: string) =>
     new Promise((resolve, reject) => {
         try {
-            FFmpeg(path)
-                .size(`626x352`)
+            FFmpeg(videoPath)
                 .on('end', () => {
                     resolve({ error: false });
                 })
@@ -242,18 +223,31 @@ const ThumbnailProceesor = async (path: string) =>
                     console.error('Error:', err);
                     reject(err);
                 })
-                .save(path)
-                .run();
-        } catch {}
+                // Extract a frame at 3 second (can be adjusted as needed)
+                .screenshots({
+                    count: 1,
+                    folder: outputPath,
+                    filename: 'Thumbnail_image.png',
+                    size: '626x352',
+                    timemarks: ['3'], // Capture at 3 second into the video
+                });
+        } catch (err) {
+            console.error('Exception:', err);
+            reject(err);
+        }
     });
 
 /**
- * Processes a video file by transcoding it to a specified size and codec.
+ * Processes a video file by transcoding it to a specified resolution and format.
+ *
  * @param {string} srcPath - The path to the source video file.
  * @param {string} dstPath - The path to the destination video file.
- * @param {number} numThreads - The number of threads to use for the video processing.
+ * @param {number} width - The desired width of the output video.
+ * @param {number} height - The desired height of the output video.
+ * @param {number} numThreads - The number of threads to use for the transcoding process.
+ * @return {void} A Promise that resolves with an object containing an 'error' property indicating whether the operation was successful.
  */
-const VideoProceesor = async (srcPath: string, dstPath: string, numThreads: number) =>
+const VideoProceesor = async (srcPath: string, dstPath: string, width: number, height: number, numThreads: number) =>
     new Promise((resolve, reject) => {
         const ffprobe = FFmpeg.ffprobe;
 
@@ -264,10 +258,9 @@ const VideoProceesor = async (srcPath: string, dstPath: string, numThreads: numb
                 return;
             }
 
-            const width = metadata.streams[0].width;
-            const height = metadata.streams[0].height;
             let videoSize = '';
-
+            console.log(width);
+            console.log(height);
             if (width! > height!) {
                 console.log('landscape');
                 // Landscape mode
@@ -395,8 +388,72 @@ const UpdateVideoData = async (req: CustomRequest, res: Response) => {
     }
 };
 
+/**
+ * delete creator video
+ * @param {CustomRequest} req
+ * @param {Response} res
+ */
+const DeleteVideo = async (req: CustomRequest, res: Response) => {
+    const errors = CustomRequestValidationResult(req);
+    if (!errors.isEmpty()) {
+        errors.array().map((error) => {
+            logging.error('GET_CREATOR_VIDEO_DATA_BY_TOKEN_FUNC', error.errorMsg);
+        });
+
+        return res.status(200).json({ error: true, errors: errors.array() });
+    }
+
+    try {
+        const connection = await req.pool?.promise().getConnection();
+        const ownerToken = await utilFunctions.getUserPublicTokenFromPrivateToken(req.pool!, req.body.UserPrivateToken);
+        if (ownerToken == null) {
+            return res.status(200).json({
+                error: true,
+            });
+        }
+
+        const GetVideoDataQueryString = `DELETE FROM videos WHERE VideoToken="${req.body.VideoToken}" AND OwnerToken="${ownerToken}"; DELETE FROM videos_category_alloc WHERE VideoToken="${req.body.VideoToken}";`;
+
+        await query(connection, GetVideoDataQueryString);
+
+        fs.stat(`${process.env.ACCOUNTS_FOLDER_PATH}/${ownerToken}/${req.body.VideoToken}/`, async (err, stats) => {
+            if (err) {
+                if (err.code === 'ENOENT') {
+                    console.log(`File does not exist: ${req.body.VideoToken}`);
+                    return res.status(202).json({
+                        error: true,
+                    });
+                } else {
+                    console.error(`Error checking file: ${err}`);
+                    return res.status(202).json({
+                        error: true,
+                    });
+                }
+            } else {
+                utilFunctions
+                    .RemoveDirectory(`${process.env.ACCOUNTS_FOLDER_PATH}/${ownerToken}/${req.body.VideoToken}/`)
+                    .then(() => {
+                        console.log(`Deleted folder: ${ownerToken}`);
+                    })
+                    .catch(console.error);
+                return res.status(202).json({
+                    error: false,
+                });
+            }
+        });
+    } catch (error: any) {
+        logging.error(NAMESPACE, `ERRRO: ${error.message}`);
+
+        return res.status(500).json({
+            message: error.message,
+            error: true,
+        });
+    }
+};
+
 export default {
     UploadVideoFileToServer,
     UpdateVideoData,
     GetAccountVideos,
+    DeleteVideo,
 };

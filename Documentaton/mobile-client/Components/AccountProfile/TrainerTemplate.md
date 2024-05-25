@@ -1,4 +1,4 @@
-## TrainerTemplate Component
+w## TrainerTemplate Component
 
 The `TrainerTemplate` component is used to display the profile of a trainer. It renders different sections of the trainer's profile based on the user's interaction.
 

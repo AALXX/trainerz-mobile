@@ -6,6 +6,7 @@ import fs from 'fs';
 import utilFunctions from '../util/utilFunctions';
 import mysql from 'mysql2';
 import axios from 'axios';
+import path from 'path';
 
 //* /////////////////////////////
 //*      Account related       //
@@ -304,7 +305,7 @@ const getUserLikedOrDislikedStream = async (pool: mysql.Pool, userToken: string,
         }
         const connection = await pool.promise().getConnection();
         const checklikeResponse = await query(connection, CheckIfUserFollwsAccountQuerryString);
-        let checklikedata = JSON.parse(JSON.stringify(checklikeResponse));
+        const checklikedata = JSON.parse(JSON.stringify(checklikeResponse));
         // console.log(checklikedata);
         if (Object.keys(checklikedata).length != 0) {
             return { userLiked: true, like_or_dislike: checklikedata[0].like_dislike };
@@ -318,21 +319,54 @@ const getUserLikedOrDislikedStream = async (pool: mysql.Pool, userToken: string,
 
 /**
  * Removes a directory
- * @param {string} dirPath
+ * @param {string} folderPath
  */
-const RemoveDirectory = (dirPath: string) => {
-    if (fs.existsSync(dirPath)) {
-        fs.readdirSync(dirPath).forEach((file) => {
-            if (fs.lstatSync(dirPath).isDirectory()) {
-                // If it's a directory, recursively remove it
-                RemoveDirectory(dirPath);
-            } else {
-                // If it's a file, delete it
-                fs.unlinkSync(dirPath);
+const RemoveDirectory = (folderPath: string): Promise<void> => {
+    return new Promise((resolve, reject) => {
+        fs.readdir(folderPath, (err, files) => {
+            if (err) {
+                return reject(err);
             }
+
+            // Iterate over all files and subdirectories
+            Promise.all(
+                files.map((file) => {
+                    const currentPath = path.join(folderPath, file);
+
+                    return new Promise<void>((resolve, reject) => {
+                        fs.lstat(currentPath, (err, stats) => {
+                            if (err) {
+                                return reject(err);
+                            }
+
+                            if (stats.isDirectory()) {
+                                // Recursively delete subdirectory
+                                RemoveDirectory(currentPath).then(resolve).catch(reject);
+                            } else {
+                                // Delete file
+                                fs.unlink(currentPath, (err) => {
+                                    if (err) {
+                                        return reject(err);
+                                    }
+                                    resolve();
+                                });
+                            }
+                        });
+                    });
+                }),
+            )
+                .then(() => {
+                    // Delete the now-empty folder
+                    fs.rmdir(folderPath, (err) => {
+                        if (err) {
+                            return reject(err);
+                        }
+                        resolve();
+                    });
+                })
+                .catch(reject);
         });
-        fs.rmdirSync(dirPath); // Remove the empty directory
-    }
+    });
 };
 
 //* /////////////////////////////

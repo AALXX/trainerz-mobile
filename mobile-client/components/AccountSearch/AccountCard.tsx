@@ -33,10 +33,12 @@ const AccountCard = (props: IAccountCard) => {
                         {props.AccountType}: {props.Sport}
                     </Text>
                 </View>
-                <View className="flex flex-row justify-center items-center ml-auto mr-2">
-                    {props.Rating == null ? <Text className="text-white text-lg ml-auto mr-2 self-center">0/5</Text> : <Text className="text-white text-lg ml-auto mr-2 self-center">{props.Rating}/5</Text>}
-                    <Image source={require('../../assets/star_icon.svg')} className="  w-8 h-8 self-center" alt="SettingIcon" />
-                </View>
+                {props.AccountType == 'Trainer' && (
+                    <View className="flex flex-row justify-center items-center ml-auto mr-2">
+                        {props.Rating == null ? <Text className="text-white text-lg ml-auto mr-2 self-center">0/5</Text> : <Text className="text-white text-lg ml-auto mr-2 self-center">{props.Rating}/5</Text>}
+                        <Image source={require('../../assets/star_icon.svg')} className="  w-8 h-8 self-center" alt="SettingIcon" />
+                    </View>
+                )}
             </View>
         </TouchableOpacity>
     )

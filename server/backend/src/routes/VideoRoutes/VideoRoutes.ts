@@ -7,6 +7,7 @@ const router = express.Router();
 
 router.post('/upload-video', body('VideoTitle').not().isEmpty().trim(), AccountVideoServices.UploadVideoFileToServer);
 router.get('/get-account-videos/:UserPublicToken', param('UserPublicToken').not().isEmpty().trim(), AccountVideoServices.GetAccountVideos);
+router.post('/delete-video', body('UserPrivateToken').not().isEmpty(), body('VideoToken').not().isEmpty(), AccountVideoServices.DeleteVideo);
 
 router.get('/get-video-data/:VideoToken', param('VideoToken').not().isEmpty().trim(), ClientVideosServices.GetVideoData);
 

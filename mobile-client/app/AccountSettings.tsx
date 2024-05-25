@@ -97,7 +97,7 @@ const AccountSettings = () => {
                         <Text className="text-sm text-white">UserName</Text>
                         <TextInput className="text-white bg-[#3b366c] h-[6vh] mt-[5%] indent-3  rounded-xl" placeholder="UserName..." value={userName} onChangeText={text => setUserName(text)} />
                     </View>
-                    <View className="flex w-[90%] self-center   h-24">
+                    <View className="flex w-[90%] self-center  mt-4 h-24">
                         <Text className="text-sm text-white">Email</Text>
                         <TextInput className="text-white bg-[#3b366c] h-[6vh] mt-[5%] indent-3 rounded-xl" placeholder="Email..." value={email} onChangeText={text => setEmail(text)} />
                     </View>
@@ -128,10 +128,10 @@ const AccountSettings = () => {
                         value={sport}
                     />
                 </View>
-                <View className="flex w-[85%] self-center  mt-[2%] h-24">
+                {/* <View className="flex w-[85%] self-center  mt-[2%] h-24">
                     <Text className="text-sm text-white">Account Type</Text>
                     <DropdownMenu options={['Trainer', 'SportsPerson']} setOption={setAccountType} value={accountType} />
-                </View>
+                </View> */}
 
                 {accountType == 'Trainer' ? (
                     <View className="flex w-[85%] self-center mt-10 h-16    ">

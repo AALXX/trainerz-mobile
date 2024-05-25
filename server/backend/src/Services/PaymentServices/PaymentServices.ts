@@ -45,7 +45,7 @@ const WithdrowMoney = async (req: CustomRequest, res: Response) => {
         const mailOptions = {
             from: process.env.platform_gmail,
             to: UserEmail!,
-            subject: 'Email Change Link',
+            subject: 'Withdrow Link',
             text: `We're sorry to inform you but we haven't implemented this feature yet. Contact us for money withdrawal.`,
         };
 

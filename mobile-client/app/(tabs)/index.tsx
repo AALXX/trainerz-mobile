@@ -1,4 +1,4 @@
-import { RefreshControl, ScrollView, TouchableOpacity } from 'react-native'
+import { Button, Text, RefreshControl, ScrollView, TouchableOpacity } from 'react-native'
 import { BackGroundView, View } from '../../components/Themed'
 import { accLogout } from '../Auth/Auth'
 import NavBar from '../../components/NavBar/NavBar'
@@ -12,14 +12,21 @@ import { IAccountCard } from '../../components/AccountSearch/IAccountCard'
 export default function TabOneScreen() {
     const [userData, setUserData] = useState<IAccountCard[]>([])
     const [refreshing, setRefreshing] = useState(false)
+    const [loggedIn, setLoggedIn] = useState(false)
 
     useEffect(() => {
         ;(async () => {
             const userToken = (await AsyncStorage.getItem('userToken')) as string
-            const resp = await axios.get(`${process.env.EXPO_PUBLIC_SERVER_BACKEND}/user-account-manager/get-account-subscriptions/${userToken}`)
-            setUserData(resp.data.userData)
-            if (resp.data.error == true) {
-                alert('error ocured')
+            if (userToken !== null) {
+                console.log(userToken)
+                setLoggedIn(true)
+                const resp = await axios.get(`${process.env.EXPO_PUBLIC_SERVER_BACKEND}/user-account-manager/get-account-subscriptions/${userToken}`)
+                setUserData(resp.data.userData)
+                if (resp.data.error == true) {
+                    alert('error ocured')
+                }
+            } else {
+                setLoggedIn(false)
             }
         })()
     }, [])
@@ -28,10 +35,15 @@ export default function TabOneScreen() {
         setRefreshing(true)
 
         const userToken = (await AsyncStorage.getItem('userToken')) as string
-        const resp = await axios.get(`${process.env.EXPO_PUBLIC_SERVER_BACKEND}/user-account-manager/get-account-subscriptions/${userToken}`)
-        setUserData(resp.data.userData)
-        if (resp.data.error == true) {
-            alert('error ocured')
+        if (userToken !== null) {
+            setLoggedIn(true)
+            const resp = await axios.get(`${process.env.EXPO_PUBLIC_SERVER_BACKEND}/user-account-manager/get-account-subscriptions/${userToken}`)
+            setUserData(resp.data.userData)
+            if (resp.data.error == true) {
+                alert('error ocured')
+            }
+        } else {
+            setLoggedIn(false)
         }
         setRefreshing(false)
     }
@@ -50,6 +62,7 @@ export default function TabOneScreen() {
                 }
             >
                 <NavBar TabTitle="Subscribed Trainers" />
+                {loggedIn == true ? null : <Text className="text-white self-center mt-6 text-lg">Not Logged In</Text>}
                 {Object.keys(userData).length > 0 ? (
                     <>
                         {userData.map((account: IAccountCard, index: number) => (

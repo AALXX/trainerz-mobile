@@ -40,14 +40,16 @@ const VideoPlayer = (props: { VideoToken: string }) => {
             alert('video no found')
         }
 
-        
         ;(async () => {
             const videoData = await getVideoData(props.VideoToken)
             const isSubbed = await isSubscribed(videoData.OwnerToken)
-            if (isSubbed){
-                alert('You don\'t have acces to this video')
-                router.back()
-            } 
+            const token = await AsyncStorage.getItem('userPublicToken')
+            if (videoData.OwnerToken !== token) {
+                if (!isSubbed) {
+                    alert("You don't have acces to this video because you are not subscribed!")
+                    router.back()
+                }
+            }
             setVideoData(videoData)
         })()
     }, [props.VideoToken])

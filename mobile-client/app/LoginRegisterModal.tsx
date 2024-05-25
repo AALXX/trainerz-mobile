@@ -21,7 +21,7 @@ const LoginRegisterModal = () => {
     const [description, setDescription] = useState<string>('')
     const [accountType, setAccountType] = useState<string>('')
     const [sport, setSport] = useState<string>('')
-    const [accountPrice, setAccountPrice] = useState<number>(0)
+    const [accountPrice, setAccountPrice] = useState<number>(5)
     const [userBirthDate, setUserBirthDate] = useState<Date>(new Date())
     const [phoneNumber, setPhoneNumber] = useState<string>('')
 

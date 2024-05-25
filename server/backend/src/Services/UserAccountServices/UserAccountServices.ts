@@ -8,6 +8,7 @@ import fs from 'fs';
 import UtilFunc from '../../util/utilFunctions';
 import multer from 'multer';
 import axios from 'axios';
+import nodemailer from 'nodemailer';
 
 const NAMESPACE = 'UserAccountService';
 
@@ -78,7 +79,7 @@ const GetUserAccountData = async (req: CustomRequest, res: Response) => {
             r.Rating
         FROM 
             users u
-        INNER JOIN 
+        LEFT JOIN 
             ratings r
         ON 
             u.UserPublicToken = r.UserToken
@@ -125,8 +126,25 @@ const GetUserAccountPublicData = async (req: CustomRequest, res: Response) => {
 
     try {
         const connection = await req.pool?.promise().getConnection();
-        const GetUserDataQueryString = `SELECT UserName, Description, AccountPrice, Sport, UserEmail, UserVisibility, AccountType 
-        FROM users WHERE UserPublicToken='${req.params.accountPublicToken}';`;
+
+        const GetUserDataQueryString = `SELECT 
+            u.UserName, 
+            u.Description, 
+            u.AccountPrice, 
+            u.Sport, 
+            u.UserEmail,
+            u.PhoneNumber, 
+            u.UserVisibility, 
+            u.AccountType, 
+            r.Rating
+        FROM 
+            users u
+        LEFT JOIN 
+            ratings r
+        ON 
+            u.UserPublicToken = r.UserToken
+        WHERE 
+            u.UserPublicToken = '${req.params.accountPublicToken}';`;
 
         const data = await query(connection, GetUserDataQueryString);
         if (Object.keys(data).length === 0) {
@@ -391,12 +409,46 @@ const RegisterUser = async (req: CustomRequest, res: Response) => {
             const resp = await axios.post(`${process.env.SEARCH_SERVER}/index-user`, {
                 UserName: req.body.userName,
                 UserPrivateToken: userPrivateToken,
+                AccountType: req.body.accountType,
                 Sport: req.body.sport,
             });
 
             if (resp.data.error == true) {
                 console.log('error');
             }
+
+            // Create a transporter with Gmail SMTP configuration
+            const transporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    user: process.env.platform_gmail,
+                    pass: process.env.platform_gmail_password,
+                },
+            });
+
+            const mailOptions = {
+                from: process.env.platform_gmail,
+                to: req.body.userEmail,
+                subject: 'Welcome to Trainerz App!',
+                text: `Hello,
+
+    An account with the Username: "${req.body.userName}", has been created. Thank you for joining Trainerz app. 
+Note that this app is still in development and if you encounter a bug, feel free to report it to us.
+
+Thank you,
+Trainerz Team`,
+            };
+
+            // Send the email
+            transporter.sendMail(mailOptions, (error, info) => {
+                if (error) {
+                    console.error(error);
+                    res.status(500).send('Error sending email');
+                } else {
+                    console.log('Email sent: ' + info.response);
+                    res.status(200).send('Email sent successfully');
+                }
+            });
 
             return res.status(202).json({
                 error: false,

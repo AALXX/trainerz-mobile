@@ -52,24 +52,20 @@ const TrainerTemplate = (props: IUserData) => {
             case 'Courses':
                 return (
                     <View className="flex h-full w-full">
-                        {Object.keys(videosData).length > 0 ? (
-                            <>
-                                {videosData.map((video: IVideoTemplateProps, index: number) => (
-                                    <VideoCardTemplate
-                                        key={index}
-                                        OwnerName={video.OwnerName}
-                                        OwnerToken={video.OwnerToken}
-                                        VideoTitle={video.VideoTitle}
-                                        VideoToken={video.VideoToken}
-                                        Views={video.Views}
-                                        ViwerToken={userPublicToken}
-                                        SportName={video.SportName}
-                                    />
-                                ))}
-                            </>
-                        ) : (
-                            <></>
-                        )}
+                        <>
+                            {videosData.map((video: IVideoTemplateProps, index: number) => (
+                                <VideoCardTemplate
+                                    key={index}
+                                    OwnerName={video.OwnerName}
+                                    OwnerToken={video.OwnerToken}
+                                    VideoTitle={video.VideoTitle}
+                                    VideoToken={video.VideoToken}
+                                    Views={video.Views}
+                                    ViwerToken={userPublicToken}
+                                    SportName={video.SportName}
+                                />
+                            ))}
+                        </>
                     </View>
                 )
             case 'About':

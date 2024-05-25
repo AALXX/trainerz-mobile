@@ -6,22 +6,21 @@ import axios from 'axios'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useLocalSearchParams } from 'expo-router'
 import { TouchableOpacity } from 'react-native-gesture-handler'
+import { useRouter } from 'expo-router'
 
 const Payment = () => {
     const { createPaymentMethod } = useStripe()
     const [email, setEmail] = useState('')
     const [loading, setLoading] = useState(false)
     const params = useLocalSearchParams()
+    const router = useRouter()
 
     const handleSubscribe = async () => {
         setLoading(true)
 
         try {
             const { paymentMethod, error } = await createPaymentMethod({
-                paymentMethodType: 'Card',
-                paymentMethodData: {
-                    billingDetails: email ? { email } : {}
-                }
+                paymentMethodType: 'Card'
             })
 
             if (error) {
@@ -31,9 +30,6 @@ const Payment = () => {
             }
 
             if (paymentMethod) {
-                // Use paymentMethod.id to attach it to a customer or create a subscription
-                console.log('PaymentMethod ID:', paymentMethod.id)
-                // Example: send paymentMethod.id to your backend to create a subscription
                 await subscribeToPlan(paymentMethod.id)
             }
         } catch (error) {
@@ -56,6 +52,7 @@ const Payment = () => {
             if (resp.data.error) {
                 alert(`Error: ${resp.data.error.message}`)
             } else {
+                router.back()
                 alert('SuccessSubscription created successfully')
             }
         } catch (error) {
@@ -84,6 +81,7 @@ const Payment = () => {
                 >
                     <Text className="text-white m-auto text-lg">Subscribe</Text>
                 </TouchableOpacity>
+                {loading ? <Text className="mt-2 text-white self-center">Wait for the payment processing!</Text> : null}
             </View>
         </BackGroundView>
     )

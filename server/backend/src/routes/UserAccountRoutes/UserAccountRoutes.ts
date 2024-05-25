@@ -24,15 +24,6 @@ router.post(
 
 
 router.post('/login-account', body('userEmail').isEmail().not().isEmpty(), body('password').isLength({ min: 4 }).not().isEmpty().trim(), UserAccountServices.LoginUser);
-// router.post('/send-change-user-password-email', body('userToken').not().isEmpty(), UserAccountServices.SendPwdLinkToEmail);
-// router.get('/check-pwd-change-link/:tokenLink/:email', param('tokenLink').not().isEmpty(), UserAccountServices.CheckResetPasswordLinkValability);
-// router.post(
-//     '/change-user-account-password',
-//     body('oldPassword').isLength({ min: 4 }).not().isEmpty(),
-//     body('newPassword').isLength({ min: 4 }).not().isEmpty(),
-//     body('userEmail').not().isEmpty(),
-//     UserAccountServices.ChangeUserPasswod,
-// );
 
 //* Account data
 router.get('/get-account-data/:accountPrivateToken', param('accountPrivateToken').not().isEmpty(), UserAccountServices.GetUserAccountData);

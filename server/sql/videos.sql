@@ -2,7 +2,7 @@ DROP TABLE IF EXISTS `videos`;
 
 CREATE TABLE `videos` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `VideoTitle` tinytext NOT NULL,
+  `VideoTitle` text NOT NULL,
   `VideoDescription` varchar(40) NOT NULL DEFAULT "",
   `PublishDate` date NOT NULL,
   `VideoPrice` int(11) DEFAULT 0,

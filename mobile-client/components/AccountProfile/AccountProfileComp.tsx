@@ -42,8 +42,7 @@ const AccountProfile = () => {
 
         /**
          * Get user profile Data
-         */
-        ;(async () => {
+         */ ;(async () => {
             const profileData = await getProfileData(await AsyncStorage.getItem('userToken'))
             setUserData(profileData.userData)
         })()

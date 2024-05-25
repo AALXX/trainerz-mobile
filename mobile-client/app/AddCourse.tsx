@@ -20,6 +20,9 @@ const AddCourse = () => {
     const [videoVisibility, setvideoVisibility] = useState<string>('public')
     const [price, setPrice] = useState(0)
     const [customPrice, setCustomPrice] = useState<boolean>(false)
+    const [videoWidth, setVideoWidth] = useState<number>(0)
+    const [videoHeight, setVideoHeight] = useState<number>(0)
+    const [loading, setLoading] = useState<boolean>(false)
 
     const videoRef = useRef(null)
 
@@ -49,25 +52,38 @@ const AddCourse = () => {
             alert('No video file selected')
             return
         }
+
+        if (media.assets![0].type == 'image') {
+            alert('media type not compatible')
+        }
+
+        if (videoTitle == '' || sport == '') {
+            alert('please fill all the inputs')
+        }
+
         const videoUri = media.assets![0].uri // Get the URI of the video
+
+        setLoading(true)
 
         let formData = new FormData()
         formData.append('VideoFile', { uri: videoUri, name: 'video.mp4', type: 'video/mp4' })
-        // formData.append('VideoThumbnail', { uri: 'http://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4', name: 'thumbnail.jpg', type: 'image/jpeg' })
         formData.append('VideoTitle', videoTitle)
         formData.append('VideoSport', sport)
-        if(customPrice) {
+        formData.append('width', videoWidth)
+        formData.append('height', videoHeight)
+        formData.append('VideoSport', sport)
+        if (customPrice) {
             formData.append('Price', price)
         } else {
             formData.append('Price', 0)
         }
-        // formData.append('VideoVisibility', videoVisibility)
         formData.append('UserPrivateToken', userToken)
 
         try {
             const response = await axios.post(`${process.env.EXPO_PUBLIC_SERVER_BACKEND}/videos-manager/upload-video`, formData, {
                 headers: { 'content-type': 'multipart/form-data' }
             })
+            setLoading(false)
 
             if (response.data.error == false) {
                 router.replace({
@@ -89,7 +105,16 @@ const AddCourse = () => {
                 <View className="w-full h-[30vh] flex ">
                     {media ? (
                         <View className="w-full h-full flex ">
-                            <Video ref={videoRef} useNativeControls={true} source={{ uri: media.assets![0].uri }} className="w-full h-[20vh]" />
+                            <Video
+                                ref={videoRef}
+                                useNativeControls={true}
+                                source={{ uri: media.assets![0].uri }}
+                                onLoad={() => {
+                                    setVideoWidth(media.assets![0].width)
+                                    setVideoHeight(media.assets![0].height)
+                                }}
+                                className="w-full h-[20vh]"
+                            />
 
                             <TouchableOpacity onPress={pickMedia} className="flex w-full h-[5vh] justify-center items-center bg-[#00000033]">
                                 <Text className="text-white">Change Media</Text>
@@ -142,6 +167,7 @@ const AddCourse = () => {
                 >
                     <Text className="w-full text-white text-center m-auto ">Upload!</Text>
                 </TouchableOpacity>
+                {loading ? <Text className="mt-2 text-white self-center">Wait for the video processing!</Text> : null}
             </View>
         </BackGroundView>
     )
